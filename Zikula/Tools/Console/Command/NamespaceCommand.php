@@ -50,35 +50,32 @@ EOF
         $traverser = new \PHPParser_NodeTraverser();
         $prettyPrinter = new \PHPParser_PrettyPrinter_Zend();
 
-//        $importTraverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
         $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
 
-//        $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
+        // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
         $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
-//        $traverser->addVisitor(new Visitor\ControllerActionVisitor());  // if controller only
 
+        $finder = new Finder();
+        $finder->in($dir)
+            ->files()
+            ->depth(0)
+            ->name('*.php');
+        foreach ($finder as $file) {
+            $output->writeln("<info>Processing {$file->getRealPath()}</info>");
+            try {
+                $code = file_get_contents($file->getRealPath());
 
-        try {
-            $code = file_get_contents($fileName);
+                $stmts = $parser->parse($code);
+                $stmts = $importTraverser->traverse($stmts);
 
-            $stmts = $parser->parse($code);
-//            var_dump($stmts);
+                $nsc->setImports($oc->getImports());
+                $stmts = $traverser->traverse($stmts);
 
-            // traverse
-            $stmts = $importTraverser->traverse($stmts);
-            $nsc->setImports($oc->getImports());
-            $stmts = $traverser->traverse($stmts);
-
-            // pretty print
-            $code = '<?php '.$prettyPrinter->prettyPrint($stmts);
-            echo "<pre>$code</pre>";
-            // write the converted file to the target directory
-//                file_put_contents(
-//                    substr_replace($file->getPathname(), "$dir/out", 0, strlen($dir)),
-//                    $code
-//                );
-        } catch (\PHPParser_Error $e) {
-            echo 'Parse Error: ', $e->getMessage();
+                $code = '<?php '."\n".$prettyPrinter->prettyPrint($stmts);
+                file_put_contents($file->getRealPath(), $code);
+            } catch (\PHPParser_Error $e) {
+                $output->writeln("<error>{$e->getMessage()}</error>");
+            }
         }
     }
 }

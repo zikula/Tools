@@ -108,7 +108,6 @@ EOF
         $helper = new Helper\CreateModuleHelper();
         file_put_contents("{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
         `git add {$moduleDir}Module.php`;
-        `git commit -a -m Restructured`;
 
         $output->writeln("<info>Done.
 Todo tasks:

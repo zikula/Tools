@@ -14,15 +14,17 @@ class ControllerActionCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('module:controller_actions')
+            ->setName('refactor:controller_actions')
             ->setDescription('Adds "Action" suffix to all public controller methods in specified controller directory')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
+                        'Target directory is mandatory - should be the Controller folder of a module')
+            ->addOption('force', null, InputOption::VALUE_NONE,
                         'Target directory is mandatory - should be the Controller folder of a module'
         )
             ->setHelp(<<<EOF
-The <info>module:controller_actions</info> command refactors controller methods with Action suffix.
+The <info>refactor:controller_actions</info> command refactors controller methods with Action suffix.
 
-<info>refactor module:controller_actions --dir=modules/MyModule/Controller</info>
+<info>refactor refactor:controller_actions --dir=modules/MyModule/Controller</info>
 EOF
         );
     }
@@ -40,10 +42,12 @@ EOF
             exit(1);
         }
 
+        $force = (bool) $input->getOption('force');
+
         $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
         $traverser = new \PHPParser_NodeTraverser();
-        $prettyPrinter = new \PHPParser_PrettyPrinter_Zend();
-        $traverser->addVisitor(new Visitor\ControllerActionVisitor());  // if controller only
+        $prettyPrinter = new Helper\PrettyPrinter();
+//        $traverser->addVisitor(new Visitor\ContjrollerActionVisitor());
 
         $finder = new Finder();
         $finder->in($dir)
@@ -51,39 +55,24 @@ EOF
             ->depth(0)
             ->name('*.php');
         foreach ($finder as $file) {
-            echo 'Processing '.$file->getRealPath()."\n";
+            $output->writeln("<info>Processing {$file->getRealPath()}</info>");
+            if (false === $force) {
+                $output->writeln("<comment>Skipped {$file->getRealPath()} use --force to process</comment>");
+                return;
+            }
+            try {
+                $code = file_get_contents($file->getRealPath());
 
+                $stmts = $parser->parse($code);
+                $stmts = $traverser->traverse($stmts);
 
-
-        try {
-            $code = file_get_contents($fileName);
-
-            $stmts = $parser->parse($code);
-//            var_dump($stmts);
-
-            // traverse
-            $stmts = $importTraverser->traverse($stmts);
-            $nsc->setImports($oc->getImports());
-            $stmts = $traverser->traverse($stmts);
-
-            // pretty print
-            $code = '<?php '.$prettyPrinter->prettyPrint($stmts);
-            echo "<pre>$code</pre>";
-            // write the converted file to the target directory
-//                file_put_contents(
-//                    substr_replace($file->getPathname(), "$dir/out", 0, strlen($dir)),
-//                    $code
-//                );
-        } catch (\PHPParser_Error $e) {
-            echo 'Parse Error: ', $e->getMessage();
-        }
-            $content = file_get_contents($file->getRealPath());
-            $content = preg_replace('/public function (\w+)\(/', 'public function $1Action(', $content);
-            file_put_contents($file->getRealPath(), $content);
+                $code = '<?php '."\n".$prettyPrinter->prettyPrint($stmts);
+                file_put_contents($file->getRealPath(), $code);
+            } catch (\PHPParser_Error $e) {
+                $output->writeln("<error>{$e->getMessage()}</error>");
+            }
         }
 
-        $output->writeln("<comment>Done.
-
-Remember to update Version.php core_min to 1.3.6</comment>");
+        $output->writeln("<comment>Done.</comment>");
     }
 }

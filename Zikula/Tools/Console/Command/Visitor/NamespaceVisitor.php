@@ -41,13 +41,11 @@ $fileDocBlock"));
 namespace $namespace;
 "));
             $return = array($comment, $use);
-            if ('Api' === $type || 'Controller' === $type) {
-                foreach ($this->imports as $import) {
-                    $return[] = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("use $import;"));
-                }
-
-                $return[] = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name(""));
+            foreach ($this->imports as $import) {
+                $return[] = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("use $import;"));
             }
+
+            $return[] = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name(""));
 
             $return[] = $node;
 

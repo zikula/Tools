@@ -642,7 +642,7 @@ class PrettyPrinter extends \PHPParser_PrettyPrinterAbstract
             .'function '.($node->byRef ? '&' : '').$node->name
             .'('.$this->pCommaSeparated($node->params).')'
             .(null !== $node->stmts
-                ? "\n".'{'."\n".$this->pStmts($node->stmts)."\n".'}'
+                ? "\n".'{'."\n".$this->pStmts($node->stmts)."\n".'}'."\n"
                 : ';');
     }
 
