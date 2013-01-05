@@ -117,7 +117,7 @@ EOF
 
         // write module file required for Kernel
         $helper = new Helper\CreateModuleHelper();
-        file_put_contents("{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
+        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
         `git add {$moduleDir}Module.php`;
 
         $output->writeln("<info>Done.
