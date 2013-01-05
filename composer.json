@@ -1,0 +1,27 @@
+{
+    "name": "zikula/tools",
+    "homepage": "http://zikula.org/",
+    "license": "MIT",
+    "description": "Zikula Tools",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Zikula\\Tools": ""
+        }
+    },
+    "authors": [
+        {
+            "name": "Drak",
+            "email": "drak@zikula.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/config": "2.2.*",
+        "symfony/console": "2.2.*",
+        "symfony/finder": "2.2.*",
+        "symfony/filesystem": "2.2.*",
+        "nikic/php-parser": "dev-master"
+    },
+    "bin": ["zikula-tools"]
+}
