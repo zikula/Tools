@@ -19,8 +19,11 @@ class MigrateResourceStructureCommand extends Command
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
                         'Target directory is mandatory - should be module directory'
         )
-            ->addOption('module', null, InputOption::VALUE_REQUIRED,
+            ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
                         'Module name mandatory - should be module directory name'
+        )
+            ->addOption('force', null, InputOption::VALUE_NONE,
+                        'Force - without this, nothing will be done.'
         )
             ->setHelp(<<<EOF
 The <info>module:restructure</info> command migrates resources</info>
@@ -34,17 +37,23 @@ EOF
     {
         $dir = $input->getOption('dir');
         if (!$dir) {
-            $output->writeln("<error>ERROR: --dir= is required</error>");
+            $output->writeln("<error>ERROR: --dir=. is required. Make sure this command is run from INSIDE the module repository as GIT is required.</error>");
             exit(1);
         }
-        $moduleDir = $input->getOption('module');
+        $moduleDir = $input->getOption('module-name');
         if (!$moduleDir) {
-            $output->writeln("<error>ERROR: --module= is required</error>");
+            $output->writeln("<error>ERROR: --module-name= is required</error>");
             exit(1);
         }
 
         if (!is_dir($dir)) {
             $output->writeln("<error>ERROR: $dir does not exist</error>");
+            exit(1);
+        }
+
+        $force = (bool) $input->getOption('force');
+        if (false === $force) {
+            $output->writeln("<error>Will not proceed without --force - Make sure this command is run from INSIDE the module repository as GIT is required.</error>");
             exit(1);
         }
 
@@ -91,18 +100,20 @@ EOF
         if (is_dir($dir.'/lib/'.$moduleDir)) {
             `mv $dir/lib/$moduleDir/* $dir`;
             `git add $dir/*`;
+
+            $output->writeln("<info>moved PHP files from $dir/lib/$moduleDir/* to $dir</info>");
+            if (is_dir("$dir/lib/vendor")) {
+                `git mv $dir/lib/vendor $dir`;
+                $output->writeln("<comment>Vendors have been moved from $dir/lib/vendor into $dir/vendor/</comment>");
+            }
             rmdir("$dir/lib/$moduleDir");
             @rmdir("$dir/lib"); // there might be a vendor dir here so suppress warnings
-            if (is_dir("$dir/lib")) {
-                $output->writeln("<comment>Please relocate any vendors from $dir/lib/vendor into $dir/vendor/</comment>");
-            }
-            $output->writeln("<info>moved PHP files from $dir/lib/$moduleDir/* to $dir</info>");
         }
 
-        `git mv Version.php {$moduleDir}Version.php`;
-        $output->writeln("<comment>renamed Version.php to $moduleDir}Version.php</comment>");
-        `git mv Installer.php {$moduleDir}Installer.php`;
-        $output->writeln("<comment>renamed Installer.php to $moduleDir}Installer.php</comment>");
+        `git mv $dir/Version.php $dir/{$moduleDir}Version.php`;
+        $output->writeln("<comment>renamed Version.php to {$moduleDir}Version.php</comment>");
+        `git mv $dir/Installer.php $dir/{$moduleDir}Installer.php`;
+        $output->writeln("<comment>renamed Installer.php to {$moduleDir}Installer.php</comment>");
 
         // write module file required for Kernel
         $helper = new Helper\CreateModuleHelper();

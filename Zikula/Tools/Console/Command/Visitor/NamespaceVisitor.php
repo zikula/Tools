@@ -25,10 +25,13 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
             $p = explode('_', $node->name);
             if (count($p) == 3) {
                 list($ns, $type, $name) = $p;
-            } else {
+            } elseif (count($p) == 2) {
                 list($ns, $name) = $p;
                 $type = '';
+            } else {
+                return $node;
             }
+
             if (preg_match('/.*'.$type.'$/', $node->name, $matches)) {
                 return $node;
             }

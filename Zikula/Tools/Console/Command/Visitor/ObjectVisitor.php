@@ -30,7 +30,9 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
                 $this->imports[$node->extends->parts[0]] = $node->extends->parts[0];
             }
         } elseif ($node instanceof \PHPParser_Node_Param) {
-            $this->imports[$node->type->parts[0]] = $node->type->parts[0];
+            if (isset($node->type->parts[0])) {
+                $this->imports[$node->type->parts[0]] = $node->type->parts[0];
+            }
         }
 
         return $node;

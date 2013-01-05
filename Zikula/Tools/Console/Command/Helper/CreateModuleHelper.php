@@ -13,7 +13,7 @@ namespace $moduleName;
 
 use Zikula\Bundle\CoreBundle\AbstractModule;
 
-class $moduleName extends AbstractModule
+class {$moduleName}Module extends AbstractModule
 {
 }
 EOF;

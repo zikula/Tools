@@ -43,22 +43,21 @@ EOF
             exit(1);
         }
 
-        $fileName = __DIR__."/src/system/Permissions/Controller/Admin.php";
-
         $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
         $importTraverser = new \PHPParser_NodeTraverser();
         $traverser = new \PHPParser_NodeTraverser();
-        $prettyPrinter = new \PHPParser_PrettyPrinter_Zend();
+        $prettyPrinter = new Helper\PrettyPrinter();
 
         $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
 
         // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
         $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
+        $nsc->setImports($oc->getImports());
 
         $finder = new Finder();
         $finder->in($dir)
             ->files()
-            ->depth(0)
+            ->depth(1)
             ->name('*.php');
         foreach ($finder as $file) {
             $output->writeln("<info>Processing {$file->getRealPath()}</info>");
@@ -72,6 +71,7 @@ EOF
                 $stmts = $traverser->traverse($stmts);
 
                 $code = '<?php '."\n".$prettyPrinter->prettyPrint($stmts);
+                $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);
             } catch (\PHPParser_Error $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
