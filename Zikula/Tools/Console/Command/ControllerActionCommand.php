@@ -47,7 +47,7 @@ EOF
         $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
         $traverser = new \PHPParser_NodeTraverser();
         $prettyPrinter = new Helper\PrettyPrinter();
-//        $traverser->addVisitor(new Visitor\ContjrollerActionVisitor());
+        $traverser->addVisitor(new Visitor\ControllerActionVisitor());
 
         $finder = new Finder();
         $finder->in($dir)
