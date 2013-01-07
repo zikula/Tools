@@ -23,6 +23,7 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
     {
         if ($node instanceof \PHPParser_Node_Expr_Instanceof ||
             $node instanceof \PHPParser_Node_Expr_ClassConstFetch ||
+            $node instanceof \PHPParser_Node_Expr_New ||
             $node instanceof \PHPParser_Node_Expr_StaticCall) {
             $name = $node->class->parts[0];
             if ('self' === $name) {
@@ -30,16 +31,15 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
             }
             $this->imports[$name] = $name;
         } elseif ($node instanceof \PHPParser_Node_Stmt_Class) {
-            //var_dump($node);die;
+            // handle extends
             if (isset($node->extends)) {
-                //$this->imports[$node->extends->parts[0]] = $node->extends->parts[0];
-                // resolve non namespaced extends or implements as root
                 $name = $node->extends->parts[0];
                 if (false === strpos($name, '\\')) {
                     $node->extends->parts[0] = '\\'.$name;
                 }
             }
 
+            // handle implements
             if (isset($node->implements[0])) {
                 foreach ($node->implements as $k => $value) {
                     $name = $node->implements[$k]->parts[0];
