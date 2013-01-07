@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
-class MigrateResourceStructureCommand extends Command
+class RestructureCommand extends Command
 {
     protected function configure()
     {
@@ -35,9 +35,10 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $pwd = getcwd();
         $dir = $input->getOption('dir');
         if (!$dir) {
-            $output->writeln("<error>ERROR: --dir=. is required. Make sure this command is run from INSIDE the module repository as GIT is required.</error>");
+            $output->writeln("<error>ERROR: --dir= is required.</error>");
             exit(1);
         }
         $moduleDir = $input->getOption('module-name');
@@ -51,17 +52,24 @@ EOF
             exit(1);
         }
 
+        if (file_exists("$dir/{$moduleDir}Module.php")) {
+            $output->writeln('<error>Looks like this module has already been restructured.</error>');
+            exit(1);
+        }
+
         $force = (bool) $input->getOption('force');
         if (false === $force) {
             $output->writeln("<error>Will not proceed without --force - Make sure this command is run from INSIDE the module repository as GIT is required.</error>");
             exit(1);
         }
+        chdir($dir);
 
         if (!is_dir($dir.'/Resources/public')) {
             if (mkdir($dir.'/Resources/public', 0755, true)) {
                 $output->writeln("<info>Created $dir/Resources/public</info>");
             } else {
                 $output->writeln("<error>Failed to create $dir/Resources/public</error>");
+                chdir($pwd);
 
                 return;
             }
@@ -115,10 +123,9 @@ EOF
         `git mv $dir/Installer.php $dir/{$moduleDir}Installer.php`;
         $output->writeln("<comment>renamed Installer.php to {$moduleDir}Installer.php</comment>");
 
-        // write module file required for Kernel
-        $helper = new Helper\CreateModuleHelper();
-        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
-        `git add {$moduleDir}Module.php`;
+        // autocommit changes
+        `git commit -a -m "[zikula-tools] Restructured to new module specification."`;
+        $output->writeln("<comment>Committed</comment>");
 
         $output->writeln("<info>Done.
 Todo tasks:
@@ -127,5 +134,6 @@ Todo tasks:
   - If there are any old calls to {pageaddvar} specifying js/css paths, these must be tweaked
 </info>");
         $output->writeln("<comment>Committed. Please now run the module:ns command.</comment>");
+        chdir($pwd);
     }
 }

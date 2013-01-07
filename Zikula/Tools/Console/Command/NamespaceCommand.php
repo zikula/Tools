@@ -77,5 +77,10 @@ EOF
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
         }
+
+        // write module file required for Kernel
+        $helper = new Helper\CreateModuleHelper();
+        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
+        `git add {$moduleDir}Module.php`;
     }
 }
