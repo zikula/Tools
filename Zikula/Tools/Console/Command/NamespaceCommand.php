@@ -25,7 +25,7 @@ class NamespaceCommand extends Command
             ->setHelp(<<<EOF
 The <info>module:ns</info> command migrates resources</info>
 
-<info>refactor module:ms --dir=modules/MyModule --module=MyModule</info>
+<info>zikula-tools module:ns --dir=modules/MyModule --module=MyModule</info>
 EOF
         );
     }

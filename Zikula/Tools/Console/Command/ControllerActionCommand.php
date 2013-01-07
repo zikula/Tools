@@ -14,7 +14,7 @@ class ControllerActionCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('refactor:controller_actions')
+            ->setName('module:controller_actions')
             ->setDescription('Adds "Action" suffix to all public controller methods in specified controller directory')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
                         'Target directory is mandatory - should be the Controller folder of a module')
@@ -22,9 +22,9 @@ class ControllerActionCommand extends Command
                         'Target directory is mandatory - should be the Controller folder of a module'
         )
             ->setHelp(<<<EOF
-The <info>refactor:controller_actions</info> command refactors controller methods with Action suffix.
+The <info>module:controller_actions</info> command refactors controller methods with Action suffix.
 
-<info>refactor refactor:controller_actions --dir=modules/MyModule/Controller</info>
+<info>zikula-tools module:controller_actions --dir=modules/MyModule/Controller</info>
 EOF
         );
     }

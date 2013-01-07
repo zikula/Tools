@@ -28,7 +28,7 @@ class RestructureCommand extends Command
             ->setHelp(<<<EOF
 The <info>module:restructure</info> command migrates resources</info>
 
-<info>refactor module:restructure --dir=modules/MyModule --module=MyModule</info>
+<info>zikula-tools module:restructure --dir=modules/MyModule --module=MyModule</info>
 EOF
         );
     }
