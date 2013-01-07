@@ -82,5 +82,10 @@ EOF
         $helper = new Helper\CreateModuleHelper();
         file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
         `git add {$moduleDir}Module.php`;
+
+        $output->writeln('<comment>WARNING: Code has been reformatted.
+
+But the main changes have simply been to the class envelope so you
+can use a diff tool to revert the class innards</comment>');
     }
 }

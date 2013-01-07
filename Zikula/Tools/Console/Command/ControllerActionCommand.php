@@ -72,6 +72,11 @@ EOF
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
         }
+        $output->writeln('<comment>WARNING: Code has been reformatted.
+
+But the main changes have simply been add \'Action\' to the end
+of public method declarations. Use a diff tool to revert any
+unwanted formatting.</comment>');
 
         $output->writeln("<comment>Done.</comment>");
     }
