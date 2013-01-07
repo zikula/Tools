@@ -41,9 +41,11 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
             }
 
             if (isset($node->implements[0])) {
-                $name = $node->implements[0]->parts[0];
-                if (false === strpos($name, '\\')) {
-                    $node->implements[0]->parts[0] = '\\'.$name;
+                foreach ($node->implements as $k => $value) {
+                    $name = $node->implements[$k]->parts[0];
+                    if (false === strpos($name, '\\')) {
+                        $node->implements[$k]->parts[0] = '\\'.$name;
+                    }
                 }
             }
         } elseif ($node instanceof \PHPParser_Node_Param) {
