@@ -62,6 +62,7 @@ EOF
             ->notName('tables.php')
             ->name('*.php');
         foreach ($finder as $file) {
+            /** @var \SplFileInfo $file */
             $output->writeln("<info>Processing {$file->getRealPath()}</info>");
             try {
                 $code = file_get_contents($file->getRealPath());
@@ -73,8 +74,15 @@ EOF
                 $stmts = $traverser->traverse($stmts);
 
                 $code = '<?php '."\n".$prettyPrinter->prettyPrint($stmts);
+                $s = end($stmts);
                 $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);
+                $pos = strrpos($file->getRealPath(), DIRECTORY_SEPARATOR);
+                $fileName = substr($file->getRealPath(), 0, $pos).DIRECTORY_SEPARATOR.$s->name;
+                if ($file->getRealPath() !== "{$fileName}.php") {
+                    `git mv {$file->getRealPath()} {$fileName}.php`;
+                    $output->writeln("<comment>Renamed {$file->getRealPath()} to {$fileName}.php</comment>");
+                }
             } catch (\PHPParser_Error $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
@@ -86,6 +94,8 @@ EOF
         `git add {$moduleDir}Module.php`;
 
         $output->writeln('<comment>WARNING: Code has been reformatted.
+
+Some files have been renamed and added to GIT. Please git status/diff and commit.
 
 But the main changes have simply been to the class envelope so you
 can use a diff tool to revert the class innards.</comment>');
