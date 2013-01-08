@@ -26,7 +26,7 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
             $node instanceof \PHPParser_Node_Expr_New ||
             $node instanceof \PHPParser_Node_Expr_StaticCall) {
             $name = $node->class->parts[0];
-            if ('self' === $name) {
+            if ('self' === $name || 'parent' === $name || 'static' === $name) {
                 return $node;
             }
             $this->imports[$name] = $name;
