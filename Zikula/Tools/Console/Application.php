@@ -15,7 +15,8 @@ class Application extends BaseApplication
 
         $this->add(new Command\ControllerActionCommand());
         $this->add(new Command\NamespaceCommand());
-        $this->add(new Command\RestructureCommand());
+        $this->add(new Command\RestructureModuleCommand());
+        $this->add(new Command\RestructureThemeCommand());
         $this->add(new Command\CompileCommand());
     }
 
