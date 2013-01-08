@@ -57,7 +57,9 @@ EOF
         $finder = new Finder();
         $finder->in($dir)
             ->files()
-            ->depth(1)
+            ->depth('< 3')
+            ->exclude('vendor')
+            ->notName('tables.php')
             ->name('*.php');
         foreach ($finder as $file) {
             $output->writeln("<info>Processing {$file->getRealPath()}</info>");
@@ -86,6 +88,6 @@ EOF
         $output->writeln('<comment>WARNING: Code has been reformatted.
 
 But the main changes have simply been to the class envelope so you
-can use a diff tool to revert the class innards</comment>');
+can use a diff tool to revert the class innards.</comment>');
     }
 }
