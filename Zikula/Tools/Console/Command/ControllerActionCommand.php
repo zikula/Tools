@@ -66,7 +66,7 @@ EOF
                 $stmts = $parser->parse($code);
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php '."\n".$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php'."\n".$prettyPrinter->prettyPrint($stmts);
                 file_put_contents($file->getRealPath(), $code);
             } catch (\PHPParser_Error $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");

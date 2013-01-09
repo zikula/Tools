@@ -73,7 +73,7 @@ EOF
                 $nsc->setImports($oc->getImports());
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php '."\n".$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php'."\n".$prettyPrinter->prettyPrint($stmts);
                 $s = end($stmts);
                 $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);
