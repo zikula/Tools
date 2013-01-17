@@ -43,17 +43,6 @@ EOF
             exit(1);
         }
 
-        $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
-        $importTraverser = new \PHPParser_NodeTraverser();
-        $traverser = new \PHPParser_NodeTraverser();
-        $prettyPrinter = new Helper\PrettyPrinter();
-
-        $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
-
-        // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
-        $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
-        $nsc->setImports($oc->getImports());
-
         $finder = new Finder();
         $finder->in($dir)
             ->files()
@@ -65,6 +54,17 @@ EOF
             /** @var \SplFileInfo $file */
             $output->writeln("<info>Processing {$file->getRealPath()}</info>");
             try {
+                $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
+                $importTraverser = new \PHPParser_NodeTraverser();
+                $traverser = new \PHPParser_NodeTraverser();
+                $prettyPrinter = new Helper\PrettyPrinter();
+
+                $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
+
+                // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
+                $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
+                $nsc->setImports($oc->getImports());
+
                 $code = file_get_contents($file->getRealPath());
 
                 $stmts = $parser->parse($code);
@@ -73,7 +73,7 @@ EOF
                 $nsc->setImports($oc->getImports());
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php'."\n".$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php'.$prettyPrinter->prettyPrint($stmts);
                 $s = end($stmts);
                 $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);

@@ -44,11 +44,6 @@ EOF
 
         $force = (bool) $input->getOption('force');
 
-        $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
-        $traverser = new \PHPParser_NodeTraverser();
-        $prettyPrinter = new Helper\PrettyPrinter();
-        $traverser->addVisitor(new Visitor\ControllerActionVisitor());
-
         $finder = new Finder();
         $finder->in($dir)
             ->files()
@@ -63,6 +58,10 @@ EOF
             try {
                 $code = file_get_contents($file->getRealPath());
 
+                $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
+                $traverser = new \PHPParser_NodeTraverser();
+                $prettyPrinter = new Helper\PrettyPrinter();
+                $traverser->addVisitor(new Visitor\ControllerActionVisitor());
                 $stmts = $parser->parse($code);
                 $stmts = $traverser->traverse($stmts);
 
