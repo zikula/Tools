@@ -23,7 +23,15 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
             $node->setAttribute('comments', $comments);
 
             $p = explode('_', $node->name);
-            if (count($p) == 3) {
+            if (count($p) == 5) {
+                list($ns, $type, $mid, $last, $name) = $p;
+                $node->name = $name;
+                $namespace = "$ns\\$type\\$mid\\$last";
+            } elseif (count($p) == 4) {
+                list($ns, $type, $mid, $name) = $p;
+                $node->name = $name;
+                $namespace = "$ns\\$type\\$mid";
+            } elseif (count($p) == 3) {
                 list($ns, $type, $name) = $p;
                 if (preg_match('/.*'.$type.'$/', $node->name, $matches)) {
                     // handle things like Foo_Controller_AdminController
