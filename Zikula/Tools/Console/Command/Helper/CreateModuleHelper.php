@@ -4,16 +4,16 @@ namespace Zikula\Tools\Console\Command\Helper;
 
 class CreateModuleHelper
 {
-    public function getTemplate($moduleName)
+    public function getTemplate($vendor, $moduleName)
     {
         $template = <<<EOF
 <?php
 
-namespace $moduleName;
+namespace $vendor\\$moduleName;
 
-use Zikula\Bundle\CoreBundle\AbstractModule;
+use Zikula\Core\AbstractModule;
 
-class {$moduleName}Module extends AbstractModule
+class {$vendor}{$moduleName}Module extends AbstractModule
 {
 }
 EOF;

@@ -19,6 +19,9 @@ class RestructureThemeCommand extends Command
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
                         'Target directory is mandatory - should be theme directory'
         )
+            ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
+                        'Vendor name mandatory'
+        )
             ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
                         'Theme name mandatory - should be theme directory name'
         )
@@ -41,6 +44,13 @@ EOF
             $output->writeln("<error>ERROR: --dir= is required.</error>");
             exit(1);
         }
+
+        $vendor = $input->getOption('vendor');
+        if (!$vendor) {
+            $output->writeln("<error>ERROR: --vendor= is required</error>");
+            exit(1);
+        }
+
         $themeDir = $input->getOption('theme-name');
         if (!$themeDir) {
             $output->writeln("<error>ERROR: --theme-name= is required</error>");
@@ -118,13 +128,13 @@ EOF
             @rmdir("$dir/lib"); // there might be a vendor dir here so suppress warnings
         }
 
-//        `git mv $dir/Version.php $dir/{$themeDir}Version.php`;
-//        $output->writeln("<comment>renamed Version.php to {$themeDir}Version.php</comment>");
+//        `git mv $dir/Version.php $dir/{$vendor}{$themeDir}Version.php`;
+//        $output->writeln("<comment>renamed Version.php to {$vendor}{$themeDir}Version.php</comment>");
 
         // write theme file required for Kernel
         $helper = new Helper\CreateThemeHelper();
-        file_put_contents("$dir/{$themeDir}Theme.php", $helper->getTemplate($themeDir));
-        `git add {$themeDir}Theme.php`;
+        file_put_contents("$dir/{$vendor}{$themeDir}Theme.php", $helper->getTemplate($vendor, $themeDir));
+        `git add {$vendor}{$themeDir}Theme.php`;
 
         // autocommit changes
         `git commit -a -m "[zikula-tools] Restructured to new theme specification."`;

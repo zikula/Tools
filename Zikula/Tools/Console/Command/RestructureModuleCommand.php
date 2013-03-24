@@ -19,6 +19,9 @@ class RestructureModuleCommand extends Command
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
                         'Target directory is mandatory - should be module directory'
         )
+            ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
+                        'Vendor mandatory'
+        )
             ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
                         'Module name mandatory - should be module directory name'
         )
@@ -41,6 +44,13 @@ EOF
             $output->writeln("<error>ERROR: --dir= is required.</error>");
             exit(1);
         }
+
+        $vendor = $input->getOption('vendor');
+        if (!$vendor) {
+            $output->writeln("<error>ERROR: --vendor= is required</error>");
+            exit(1);
+        }
+
         $moduleDir = $input->getOption('module-name');
         if (!$moduleDir) {
             $output->writeln("<error>ERROR: --module-name= is required</error>");
@@ -52,7 +62,7 @@ EOF
             exit(1);
         }
 
-        if (file_exists("$dir/{$moduleDir}Module.php")) {
+        if (file_exists("$dir/{$vendor}{$moduleDir}Module.php")) {
             $output->writeln('<error>Looks like this module has already been restructured.</error>');
             exit(1);
         }

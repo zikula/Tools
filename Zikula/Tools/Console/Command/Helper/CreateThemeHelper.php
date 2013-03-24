@@ -4,16 +4,16 @@ namespace Zikula\Tools\Console\Command\Helper;
 
 class CreateThemeHelper
 {
-    public function getTemplate($themeName)
+    public function getTemplate($vendor, $themeName)
     {
         $template = <<<EOF
 <?php
 
-namespace $themeName;
+namespace $vendor\\$themeName;
 
 use Zikula\Bundle\CoreBundle\AbstractTheme;
 
-class {$themeName}Theme extends AbstractTheme
+class {$vendor}{$themeName}Theme extends AbstractTheme
 {
 }
 EOF;

@@ -19,13 +19,16 @@ class NamespaceCommand extends Command
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
                         'Target directory is mandatory - should be module directory'
         )
+            ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
+                        'Vendor name mandatory'
+        )
             ->addOption('module', null, InputOption::VALUE_REQUIRED,
                         'Module name mandatory - should be module directory name'
         )
             ->setHelp(<<<EOF
 The <info>module:ns</info> command migrates resources</info>
 
-<info>zikula-tools module:ns --dir=modules/MyModule --module=MyModule</info>
+<info>zikula-tools module:ns --dir=modules/MyModule --vendor=Foo --module=MyModule</info>
 EOF
         );
     }
@@ -37,6 +40,13 @@ EOF
             $output->writeln("<error>ERROR: --dir= is required</error>");
             exit(1);
         }
+
+        $vendor = $input->getOption('vendor');
+        if (!$vendor) {
+            $output->writeln("<error>ERROR: --vendor= is required</error>");
+            exit(1);
+        }
+
         $moduleDir = $input->getOption('module');
         if (!$moduleDir) {
             $output->writeln("<error>ERROR: --module= is required</error>");
@@ -90,8 +100,13 @@ EOF
 
         // write module file required for Kernel
         $helper = new Helper\CreateModuleHelper();
-        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($moduleDir));
+        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($vendor, $moduleDir));
         `git add {$moduleDir}Module.php`;
+
+        // write composer.json file required for Kernel
+        $helper = new Helper\CreateModuleHelper();
+        file_put_contents("$dir/composer.json", $helper->getTemplate($vendor, $moduleDir, 'Module'));
+        `git add composer.json`;
 
         $output->writeln('<comment>WARNING: Code has been reformatted.
 
