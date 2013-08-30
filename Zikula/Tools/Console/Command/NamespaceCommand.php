@@ -59,6 +59,7 @@ EOF
             ->depth('< 3')
             ->exclude('vendor')
             ->notName('tables.php')
+            ->notName('bootstrap.php')
             ->name('*.php');
         foreach ($finder as $file) {
             /** @var \SplFileInfo $file */
