@@ -21,7 +21,8 @@
         "symfony/console": "2.2.*",
         "symfony/finder": "2.2.*",
         "symfony/filesystem": "2.2.*",
-        "nikic/php-parser": "dev-master"
+        "nikic/php-parser": "dev-master",
+        "fabpot/php-cs-fixer": "0.3.*@dev"
     },
     "bin": ["zikula-tools"]
 }
