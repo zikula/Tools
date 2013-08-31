@@ -68,7 +68,7 @@ EOF
                 $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
                 $importTraverser = new \PHPParser_NodeTraverser();
                 $traverser = new \PHPParser_NodeTraverser();
-                $prettyPrinter = new Helper\PrettyPrinter();
+                $prettyPrinter = new \PHPParserPSR2_Printer();
 
                 $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
 

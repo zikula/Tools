@@ -60,7 +60,7 @@ EOF
 
                 $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
                 $traverser = new \PHPParser_NodeTraverser();
-                $prettyPrinter = new Helper\PrettyPrinter();
+                $prettyPrinter = new \PHPParserPSR2_Printer();
                 $traverser->addVisitor(new Visitor\ControllerActionVisitor());
                 $stmts = $parser->parse($code);
                 $stmts = $traverser->traverse($stmts);
