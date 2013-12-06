@@ -52,6 +52,9 @@ EOF
             $output->writeln("<error>ERROR: --module= is required</error>");
             exit(1);
         }
+        if (strcmp(substr($moduleDir, -6), 'Module') !== 0) {
+            $moduleDir .= 'Module';
+        }
 
         $finder = new Finder();
         $finder->in($dir)
@@ -74,6 +77,8 @@ EOF
 
                 // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
                 $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
+                $nsc->setVendor($vendor);
+                $nsc->setModuleDirectory($moduleDir);
                 $nsc->setImports($oc->getImports());
 
                 $code = file_get_contents($file->getRealPath());
@@ -90,7 +95,7 @@ EOF
                 file_put_contents($file->getRealPath(), $code);
                 $pos = strrpos($file->getRealPath(), DIRECTORY_SEPARATOR);
                 $fileName = substr($file->getRealPath(), 0, $pos).DIRECTORY_SEPARATOR.$s->name;
-                $isInstaller = substr($file->getFilename(), -20) == 'ModuleInstaller.php';
+                $isInstaller = substr($file->getFilename(), -19) == 'ModuleInstaller.php';
                 $isVersion = substr($file->getFilename(), -17) == 'ModuleVersion.php';
                 if (($file->getRealPath() !== "{$fileName}.php") && !$isInstaller && !$isVersion) {
                     `git mv {$file->getRealPath()} {$fileName}.php`;
@@ -103,8 +108,8 @@ EOF
 
         // write module file required for Kernel
         $helper = new Helper\CreateModuleHelper();
-        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($vendor, $moduleDir));
-        `git add {$moduleDir}Module.php`;
+        file_put_contents("$dir/{$vendor}{$moduleDir}.php", $helper->getTemplate($vendor, $moduleDir));
+        `git add {$vendor}{$moduleDir}.php`;
 
         // write composer.json file required for Kernel
         $helper = new Helper\CreateComposerHelper();
