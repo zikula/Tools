@@ -105,7 +105,7 @@ EOF
         `git add {$moduleDir}Module.php`;
 
         // write composer.json file required for Kernel
-        $helper = new Helper\CreateModuleHelper();
+        $helper = new Helper\CreateComposerHelper();
         file_put_contents("$dir/composer.json", $helper->getTemplate($vendor, $moduleDir, 'Module'));
         `git add composer.json`;
 
