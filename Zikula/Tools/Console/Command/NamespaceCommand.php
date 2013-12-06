@@ -90,7 +90,9 @@ EOF
                 file_put_contents($file->getRealPath(), $code);
                 $pos = strrpos($file->getRealPath(), DIRECTORY_SEPARATOR);
                 $fileName = substr($file->getRealPath(), 0, $pos).DIRECTORY_SEPARATOR.$s->name;
-                if ($file->getRealPath() !== "{$fileName}.php") {
+                $isInstaller = substr($file->getFilename(), -20) == 'ModuleInstaller.php';
+                $isVersion = substr($file->getFilename(), -17) == 'ModuleVersion.php';
+                if (($file->getRealPath() !== "{$fileName}.php") && !$isInstaller && !$isVersion) {
                     `git mv {$file->getRealPath()} {$fileName}.php`;
                     $output->writeln("<comment>Renamed {$file->getRealPath()} to {$fileName}.php</comment>");
                 }
