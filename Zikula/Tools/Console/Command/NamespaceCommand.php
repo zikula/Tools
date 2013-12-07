@@ -116,7 +116,24 @@ EOF
         file_put_contents("$dir/composer.json", $helper->getTemplate($vendor, $moduleDir, 'Module'));
         `git add composer.json`;
 
-        $output->writeln('<comment>WARNING: Code has been reformatted.
+        // create new PSR-0 directory tree
+        if (!is_dir($dir.'/'.$vendor.'/Module/'.$moduleDir)) {
+            if (mkdir($dir.'/'.$vendor.'/Module/'.$moduleDir, 0755, true)) {
+                $output->writeln("<info>Created new subdirectories (PSR-0)</info>");
+            } else {
+                $output->writeln("<error>Failed to create new subdirectories (PSR-0)</error>");
+                chdir($pwd);
+
+                return;
+            }
+        }
+
+        // move all files to new directory (`-k` skips trying to move directory into itself)
+        `git mv -k $dir/* $dir/$vendor/Module/$moduleDir`;
+        $output->writeln("<info>moved all files to subdirectory (PSR-0)</info>");
+
+
+        $output->writeln('<comment>WARNING: Code has been reformatted and moved.
 
 Some files have been renamed and added to GIT. Please git status/diff and commit.
 
