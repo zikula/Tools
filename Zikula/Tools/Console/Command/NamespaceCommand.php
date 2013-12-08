@@ -35,6 +35,7 @@ EOF
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $pwd = getcwd();
         $dir = $input->getOption('dir');
         if (!$dir) {
             $output->writeln("<error>ERROR: --dir= is required</error>");
@@ -89,7 +90,7 @@ EOF
                 $nsc->setImports($oc->getImports());
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php'.$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php'."\r\n".$prettyPrinter->prettyPrint($stmts);
                 $s = end($stmts);
                 $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);
