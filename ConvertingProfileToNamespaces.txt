@@ -1,0 +1,55 @@
+Refactoring a Module for Namespaces
+December 7, 2013
+Craig Heydenburg
+
+OVERVIEW
+Read all of these notes before beginning. Especially the final points about the upgrade process. 
+
+
+NOTES: Someone had already partially converted Dizkus, so the templates and other assets had been moved to /Resources and the controller actions had already been suffixed with ‘Action’
+
+
+STEP ONE:
+run module:restructure 
+php ../../../Tools.git/zikula-tools module:restructure --vendor=Zikula --module-name=ProfileModule --dir=. --force
+
+notes: 
+1. is —module-name and not —module also name should include ‘Module’ like ‘ProfileModule’ not just ‘Profile’
+2. auto-commits via git
+
+
+STEP TWO:
+run module:ns
+php ../../../Tools.git/zikula-tools module:ns --dir=. --vendor=Zikula --module=ProfileModule
+
+notes: 
+1. use —module
+2. use “ProfileModule” not “Profile”
+3. not auto committed
+
+
+STEP THREE
+(no need to run module:controller_actions on Profile as it had already been done)
+
+
+CLEAN UP STEPS (manual work):
+1. look for instances where the import (use) statements have been placed above the namespace and move below
+2. look for root level classnames (e.g. Profile_Constant) and convert them to slash-names
+3. look for legacy Zikula classes (e.g. Zikula_Event) and place forward-slash before (e.g. \Zikula_Event)
+4. look for places where the top comment block starts on first line: <?php/* - add a new line there (may be fixed in tool)
+5. convert string versions of classnames (in quotes like ‘Profile_Entity_Property’) to slash-names (‘Zikula\Module\ProfileModule\Entity\PropertyEntity’)
+6. move the module read me file back to the root level of the module
+7. reformat arrays and class method chains
+8. correct use of module name throughout: ‘Profile’ to ‘ZikulaProfileModule’
+  - recommend using `$this->name` in php files that extend from Zikula_AbstractBase and `$module` in templates.
+  - in other places, consider using a constant instead
+  - convert modvar keys (from $modvars.Profile.foo to $modvars.$module.foo)
+  - convert name usage in permission checks
+9. consider places in the DB that might be storing the original module name and write upgrade routine to compensate
+10. consider permissions module DB changes
+
+
+UPGRADE
+At this time, it is unclear how the core is handling an upgrade from Widget to AcmeWidgetModule. There are issues with persistent events being called on the old classname and also if the module will recognize itself in order to upgrade.
+
+For the moment, you should uninstall the module completely before making any of these conversions and then reinstall once everything is done.
