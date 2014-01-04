@@ -41,7 +41,8 @@ CLEAN UP STEPS (manual work):
 5. convert string versions of classnames (in quotes like 'Profile_Entity_Property') to slash-names
     ('Zikula\Module\ProfileModule\Entity\PropertyEntity')
 5a. you can now use shortcut entity names: `'ZikulaProfileModule:PropertyEntity'` instead of
-    `'Zikula\Module\ProfileModule\Entity\PropertyEntity'` when used as a string in entityManager searches.
+    `'Zikula\Module\ProfileModule\Entity\PropertyEntity'` when used as a string in entityManager searches (but **not** in
+    the SchemaTool (e.g. `DoctrineHelper::createSchema()`)
 6. move the module read me file back to the root level of the module
 7. reformat arrays and class method chains
 8. correct use of module name throughout: 'Profile' to 'ZikulaProfileModule'
