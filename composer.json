@@ -22,8 +22,8 @@
         "symfony/finder": "2.2.*",
         "symfony/filesystem": "2.2.*",
         "nikic/php-parser": "dev-master",
-	"tcopestake/php-parser-psr-2-pretty-printer": "dev-master",
-        "fabpot/php-cs-fixer": "0.3.*@dev"
+	    "tcopestake/php-parser-psr-2-pretty-printer": "dev-master",
+        "fabpot/php-cs-fixer": "0.4.*"
     },
     "bin": ["zikula-tools"]
 }
