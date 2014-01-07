@@ -35,7 +35,6 @@ EOF
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $pwd = getcwd();
         $dir = $input->getOption('dir');
         if (!$dir) {
             $output->writeln("<error>ERROR: --dir= is required</error>");
