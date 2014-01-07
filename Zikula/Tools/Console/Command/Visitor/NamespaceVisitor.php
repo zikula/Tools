@@ -73,7 +73,7 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
             }
 
             $use = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("
-namespace {$this->vendor}\\Module\\$namespace;
+namespace {$this->vendor}\\$namespace;
 "));
 
             $comment = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("

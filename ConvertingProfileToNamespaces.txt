@@ -11,7 +11,7 @@ and the controller actions had already been suffixed with 'Action'
 
 
 STEP ONE:
-run module:restructure 
+run module:restructure from inside the module directory
 php ../../../Tools.git/zikula-tools module:restructure --vendor=Zikula --module-name=ProfileModule --dir=. --force
 
 notes: 
@@ -20,11 +20,11 @@ notes:
 
 
 STEP TWO:
-run module:ns
-php ../../../Tools.git/zikula-tools module:ns --dir=. --vendor=Zikula --module=ProfileModule
+run module:ns from inside the module directory
+php ../../../Tools.git/zikula-tools module:ns --dir=. --vendor=Zikula --module-name=ProfileModule
 
 notes: 
-1. use —module
+1. use —module-name also
 2. use “ProfileModule” not “Profile”
 3. not auto committed
 
@@ -36,22 +36,22 @@ STEP THREE
 CLEAN UP STEPS (manual work):
 1. look for instances where the import (use) statements have been placed above the namespace and move below
 2. look for root level classnames (e.g. Profile_Constant) and convert them to slash-names
-3. look for legacy Zikula classes (e.g. Zikula_Event) and place forward-slash before (e.g. \Zikula_Event)
-4. look for places where the top comment block starts on first line: <?php/* - add a new line there (may be fixed in tool)
-5. convert string versions of classnames (in quotes like 'Profile_Entity_Property') to slash-names
+2a. look for and refactor Helper or Listener classnames and convert to slash-names
+3. look for legacy Zikula classes (e.g. Zikula_Event) and place forward-slash before (e.g. \Zikula_Event) or add imports.
+4. convert string versions of classnames (in quotes like 'Profile_Entity_Property') to slash-names
     ('Zikula\Module\ProfileModule\Entity\PropertyEntity')
-5a. you can now use shortcut entity names: `'ZikulaProfileModule:PropertyEntity'` instead of
+5. you can now use shortcut entity names: `'ZikulaProfileModule:PropertyEntity'` instead of
     `'Zikula\Module\ProfileModule\Entity\PropertyEntity'` when used as a string in entityManager searches (but **not** in
     the SchemaTool (e.g. `DoctrineHelper::createSchema()`)
-6. move the module read me file back to the root level of the module
-7. reformat arrays and class method chains
-8. correct use of module name throughout: 'Profile' to 'ZikulaProfileModule'
+6. reformat arrays and class method chains
+7. correct use of module name throughout: 'Profile' to 'ZikulaProfileModule'
   - recommend using `$this->name` in php files that extend from Zikula_AbstractBase and `$module` in templates.
   - in other places, consider using a constant instead
   - convert modvar keys (from $modvars.Profile.foo to $modvars.$module.foo)
   - convert name usage in permission checks
-9. consider places in the DB that might be storing the original module name and write upgrade routine to compensate
-10. consider permissions module DB changes
+8. consider places in the DB that might be storing the original module name and write upgrade routine to compensate
+9. consider permissions module DB changes
+10. add old module name ('Profile') to 'oldnames' array in Version
 
 
 UPGRADE

@@ -9,7 +9,7 @@ class CreateModuleHelper
         $template = <<<EOF
 <?php
 
-namespace $vendor\\Module\\$moduleName;
+namespace $vendor\\$moduleName;
 
 use Zikula\Core\AbstractModule;
 

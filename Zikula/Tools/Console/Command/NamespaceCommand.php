@@ -22,13 +22,13 @@ class NamespaceCommand extends Command
             ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
                         'Vendor name mandatory'
         )
-            ->addOption('module', null, InputOption::VALUE_REQUIRED,
+            ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
                         'Module name mandatory - should be module directory name'
         )
             ->setHelp(<<<EOF
 The <info>module:ns</info> command migrates resources</info>
 
-<info>zikula-tools module:ns --dir=modules/MyModule --vendor=Foo --module=MyModule</info>
+<info>zikula-tools module:ns --dir=. --vendor=Foo --module-name=MyModule</info>
 EOF
         );
     }
@@ -48,7 +48,7 @@ EOF
             exit(1);
         }
 
-        $moduleDir = $input->getOption('module');
+        $moduleDir = $input->getOption('module-name');
         if (!$moduleDir) {
             $output->writeln("<error>ERROR: --module= is required</error>");
             exit(1);
@@ -118,20 +118,20 @@ EOF
         `git add composer.json`;
 
         // create new PSR-0 directory tree
-        if (!is_dir($dir.'/'.$vendor.'/Module/'.$moduleDir)) {
-            if (mkdir($dir.'/'.$vendor.'/Module/'.$moduleDir, 0755, true)) {
-                $output->writeln("<info>Created new subdirectories (PSR-0)</info>");
-            } else {
-                $output->writeln("<error>Failed to create new subdirectories (PSR-0)</error>");
-                chdir($pwd);
-
-                return;
-            }
-        }
+//        if (!is_dir($dir.'/'.$vendor.'/Module/'.$moduleDir)) {
+//            if (mkdir($dir.'/'.$vendor.'/Module/'.$moduleDir, 0755, true)) {
+//                $output->writeln("<info>Created new subdirectories (PSR-0)</info>");
+//            } else {
+//                $output->writeln("<error>Failed to create new subdirectories (PSR-0)</error>");
+//                chdir($pwd);
+//
+//                return;
+//            }
+//        }
 
         // move all files to new directory (`-k` skips trying to move directory into itself)
-        `git mv -k $dir/* $dir/$vendor/Module/$moduleDir`;
-        $output->writeln("<info>moved all files to subdirectory (PSR-0)</info>");
+//        `git mv -k $dir/* $dir/$vendor/Module/$moduleDir`;
+//        $output->writeln("<info>moved all files to subdirectory (PSR-0)</info>");
 
 
         $output->writeln('<comment>WARNING: Code has been reformatted and moved.

@@ -31,14 +31,14 @@ class CreateComposerHelper
         }
     ],
     "autoload": {
-        "psr-0": { "$vendor\\\\$suffix\\\\$name\\\\": "" }
+        "psr-4": { "$vendor\\\\$name\\\\": "" }
     },
     "require": {
         "php": ">5.3.3"
     },
     "extra": {
         "zikula": {
-            "class": "$vendor\\\\$suffix\\\\$name\\\\{$vendor}{$name}"
+            "class": "$vendor\\\\$name\\\\{$vendor}{$name}"
         }
     }
 }
