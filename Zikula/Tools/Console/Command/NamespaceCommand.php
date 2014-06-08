@@ -17,18 +17,18 @@ class NamespaceCommand extends Command
             ->setName('module:ns')
             ->setDescription('Namespaces module')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be module directory'
+                        'Target directory is mandatory - should be current directory e.g. dir=.'
         )
             ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
                         'Vendor name mandatory'
         )
             ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
-                        'Module name mandatory - should be module directory name'
+                        'Module name mandatory - should be new module name'
         )
             ->setHelp(<<<EOF
-The <info>module:ns</info> command migrates resources</info>
+The <info>module:ns</info> command converts to namespaced classes</info>
 
-<info>zikula-tools module:ns --dir=. --vendor=Foo --module-name=MyModule</info>
+<info>zikula-tools module:ns --dir=. --vendor=Acme --module-name=WidgetModule</info>
 EOF
         );
     }
@@ -75,7 +75,6 @@ EOF
 
                 $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
 
-                // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
                 $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
                 $nsc->setVendor($vendor);
                 $nsc->setModuleDirectory($moduleDir);
