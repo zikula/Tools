@@ -7,7 +7,14 @@ class CreateComposerHelper
     public function getTemplate($vendor, $name, $suffix)
     {
         $vendorL = strtolower($vendor);
-        $nameL = strtolower($name);
+        if (strcasecmp(substr($name, -6), 'module') === 0) {
+            $nameL = strtolower(substr($name, 0, -6));
+        } else if (strcasecmp(substr($name, -5), 'theme') === 0) {
+            $nameL = strtolower(substr($name, 0 -5));
+        } else {
+            $nameL = strtolower($name);
+            $name = ucfirst($name) . ucfirst($suffix);
+        }
         $suffixL = strtolower($suffix);
 
         $template = <<<EOF
@@ -24,14 +31,14 @@ class CreateComposerHelper
         }
     ],
     "autoload": {
-        "psr-0": { "$vendor\\\\$name\\\\": "" }
+        "psr-4": { "$vendor\\\\$name\\\\": "" }
     },
     "require": {
         "php": ">5.3.3"
     },
     "extra": {
         "zikula": {
-            "class": "$vendor\\\\$name\\\\{$vendor}{$name}{$suffix}"
+            "class": "$vendor\\\\$name\\\\{$vendor}{$name}"
         }
     }
 }

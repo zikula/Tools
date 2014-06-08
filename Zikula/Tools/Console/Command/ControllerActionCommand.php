@@ -17,14 +17,14 @@ class ControllerActionCommand extends Command
             ->setName('module:controller_actions')
             ->setDescription('Adds "Action" suffix to all public controller methods in specified controller directory')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be the Controller folder of a module')
+                        'Target directory is mandatory - should be the Controller folder of a module e.g. dir=./Controller')
             ->addOption('force', null, InputOption::VALUE_NONE,
-                        'Target directory is mandatory - should be the Controller folder of a module'
+                        'must require --force'
         )
             ->setHelp(<<<EOF
 The <info>module:controller_actions</info> command refactors controller methods with Action suffix.
 
-<info>zikula-tools module:controller_actions --dir=modules/MyModule/Controller</info>
+<info>zikula-tools module:controller_actions --dir=./Controller --force</info>
 EOF
         );
     }

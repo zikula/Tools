@@ -13,7 +13,7 @@ namespace $vendor\\$moduleName;
 
 use Zikula\Core\AbstractModule;
 
-class {$vendor}{$moduleName}Module extends AbstractModule
+class {$vendor}{$moduleName} extends AbstractModule
 {
 }
 EOF;

@@ -17,13 +17,13 @@ class RestructureModuleCommand extends Command
             ->setName('module:restructure')
             ->setDescription('Creates and moves structure')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be module directory'
+                        'Target directory is mandatory - should be current directory e.g. --dir=.'
         )
             ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
                         'Vendor mandatory'
         )
             ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
-                        'Module name mandatory - should be module directory name'
+                        'Module name mandatory - should be intended module name'
         )
             ->addOption('force', null, InputOption::VALUE_NONE,
                         'Force - without this, nothing will be done.'
@@ -31,7 +31,7 @@ class RestructureModuleCommand extends Command
             ->setHelp(<<<EOF
 The <info>module:restructure</info> command migrates resources</info>
 
-<info>zikula-tools module:restructure --dir=modules/MyModule --module=MyModule</info>
+<info>zikula-tools module:restructure --vendor=Acme --dir=. --module-name=WidgetModule --force</info>
 EOF
         );
     }
@@ -39,6 +39,8 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $pwd = getcwd();
+        $cwdArray = explode('/', $pwd);
+        $currentDirectory = array_pop($cwdArray);
         $dir = $input->getOption('dir');
         if (!$dir) {
             $output->writeln("<error>ERROR: --dir= is required.</error>");
@@ -62,7 +64,7 @@ EOF
             exit(1);
         }
 
-        if (file_exists("$dir/{$vendor}{$moduleDir}Module.php")) {
+        if (file_exists("$dir/{$vendor}{$currentDirectory}Module.php")) {
             $output->writeln('<error>Looks like this module has already been restructured.</error>');
             exit(1);
         }
@@ -115,16 +117,16 @@ EOF
             $output->writeln("<info>moved $dir/templates to $dir/Resources/public/views</info>");
         }
 
-        if (is_dir($dir.'/lib/'.$moduleDir)) {
-            `mv $dir/lib/$moduleDir/* $dir`;
-            `git add $dir/*`;
+        if (is_dir($dir.'/lib/'.$currentDirectory)) {
+            `mv $dir/lib/$currentDirectory/* $dir`;
+            `git add --ignore-removal $dir/*`;
 
-            $output->writeln("<info>moved PHP files from $dir/lib/$moduleDir/* to $dir</info>");
+            $output->writeln("<info>moved PHP files from $dir/lib/$currentDirectory/* to $dir</info>");
             if (is_dir("$dir/lib/vendor")) {
                 `git mv $dir/lib/vendor $dir`;
                 $output->writeln("<comment>Vendors have been moved from $dir/lib/vendor into $dir/vendor/</comment>");
             }
-            rmdir("$dir/lib/$moduleDir");
+            rmdir("$dir/lib/$currentDirectory");
             @rmdir("$dir/lib"); // there might be a vendor dir here so suppress warnings
         }
 
@@ -134,14 +136,14 @@ EOF
         $output->writeln("<comment>renamed Installer.php to {$moduleDir}Installer.php</comment>");
 
         // autocommit changes
-        `git commit -a -m "[zikula-tools] Restructured to new module specification."`;
+        `git commit -a -m "[zikula-tools] Restructured to Core1.4/psr-4 module specification."`;
         $output->writeln("<comment>Committed</comment>");
 
         $output->writeln("<info>Done.
 Todo tasks:
 
-  - Update {$moduleDir}Version.php core_min to 1.3.6
-  - If there are any old calls to {pageaddvar} specifying js/css paths, these must be tweaked
+  - Update {$moduleDir}Version.php core_min to 1.4.0
+  - If there are any old calls to {pageaddvar} specifying js/css paths, these must be updated.
 </info>");
         $output->writeln("<comment>Committed. Please now run the module:ns command.</comment>");
         chdir($pwd);

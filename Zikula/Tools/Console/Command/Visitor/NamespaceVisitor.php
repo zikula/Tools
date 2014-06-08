@@ -6,9 +6,23 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
 {
     private $imports = array();
 
+    private $vendor = '';
+
+    private $moduleDirectory = '';
+
     public function setImports($imports)
     {
         $this->imports = $imports;
+    }
+
+    public function setVendor($vendor)
+    {
+        $this->vendor = $vendor;
+    }
+
+    public function setModuleDirectory($md)
+    {
+        $this->moduleDirectory = $md;
     }
 
     public function leaveNode(\PHPParser_Node $node)
@@ -26,10 +40,12 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
             if (count($p) == 5) {
                 list($ns, $type, $mid, $last, $name) = $p;
                 $node->name = $name;
+                $ns = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 $namespace = "$ns\\$type\\$mid\\$last";
             } elseif (count($p) == 4) {
                 list($ns, $type, $mid, $name) = $p;
                 $node->name = $name;
+                $ns = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 $namespace = "$ns\\$type\\$mid";
             } elseif (count($p) == 3) {
                 list($ns, $type, $name) = $p;
@@ -38,9 +54,11 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
                     return $node;
                 }
                 $node->name = "{$name}{$type}";
+                $ns = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 $namespace = $type ? "$ns\\$type" : $ns;
             } elseif (count($p) == 2) {
-                list($namespace, $name) = $p;
+                list($ns, $name) = $p;
+                $namespace = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 switch ($name) {
                     case 'Installer':
                     case 'Version':
@@ -55,7 +73,7 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
             }
 
             $use = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("
-namespace $namespace;
+namespace {$this->vendor}\\$namespace;
 "));
 
             $comment = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("

@@ -17,18 +17,18 @@ class NamespaceCommand extends Command
             ->setName('module:ns')
             ->setDescription('Namespaces module')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be module directory'
+                        'Target directory is mandatory - should be current directory e.g. dir=.'
         )
             ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
                         'Vendor name mandatory'
         )
-            ->addOption('module', null, InputOption::VALUE_REQUIRED,
-                        'Module name mandatory - should be module directory name'
+            ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
+                        'Module name mandatory - should be new module name'
         )
             ->setHelp(<<<EOF
-The <info>module:ns</info> command migrates resources</info>
+The <info>module:ns</info> command converts to namespaced classes</info>
 
-<info>zikula-tools module:ns --dir=modules/MyModule --vendor=Foo --module=MyModule</info>
+<info>zikula-tools module:ns --dir=. --vendor=Acme --module-name=WidgetModule</info>
 EOF
         );
     }
@@ -47,10 +47,13 @@ EOF
             exit(1);
         }
 
-        $moduleDir = $input->getOption('module');
+        $moduleDir = $input->getOption('module-name');
         if (!$moduleDir) {
             $output->writeln("<error>ERROR: --module= is required</error>");
             exit(1);
+        }
+        if (strcmp(substr($moduleDir, -6), 'Module') !== 0) {
+            $moduleDir .= 'Module';
         }
 
         $finder = new Finder();
@@ -72,8 +75,9 @@ EOF
 
                 $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
 
-                // $traverser->addVisitor(new \PHPParser_NodeVisitor_NameResolver());
                 $traverser->addVisitor($nsc = new Visitor\NamespaceVisitor());
+                $nsc->setVendor($vendor);
+                $nsc->setModuleDirectory($moduleDir);
                 $nsc->setImports($oc->getImports());
 
                 $code = file_get_contents($file->getRealPath());
@@ -84,13 +88,15 @@ EOF
                 $nsc->setImports($oc->getImports());
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php'.$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php'."\r\n".$prettyPrinter->prettyPrint($stmts);
                 $s = end($stmts);
                 $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);
                 $pos = strrpos($file->getRealPath(), DIRECTORY_SEPARATOR);
                 $fileName = substr($file->getRealPath(), 0, $pos).DIRECTORY_SEPARATOR.$s->name;
-                if ($file->getRealPath() !== "{$fileName}.php") {
+                $isInstaller = substr($file->getFilename(), -19) == 'ModuleInstaller.php';
+                $isVersion = substr($file->getFilename(), -17) == 'ModuleVersion.php';
+                if (($file->getRealPath() !== "{$fileName}.php") && !$isInstaller && !$isVersion) {
                     `git mv {$file->getRealPath()} {$fileName}.php`;
                     $output->writeln("<comment>Renamed {$file->getRealPath()} to {$fileName}.php</comment>");
                 }
@@ -101,15 +107,15 @@ EOF
 
         // write module file required for Kernel
         $helper = new Helper\CreateModuleHelper();
-        file_put_contents("$dir/{$moduleDir}Module.php", $helper->getTemplate($vendor, $moduleDir));
-        `git add {$moduleDir}Module.php`;
+        file_put_contents("$dir/{$vendor}{$moduleDir}.php", $helper->getTemplate($vendor, $moduleDir));
+        `git add {$vendor}{$moduleDir}.php`;
 
         // write composer.json file required for Kernel
-        $helper = new Helper\CreateModuleHelper();
+        $helper = new Helper\CreateComposerHelper();
         file_put_contents("$dir/composer.json", $helper->getTemplate($vendor, $moduleDir, 'Module'));
         `git add composer.json`;
 
-        $output->writeln('<comment>WARNING: Code has been reformatted.
+        $output->writeln('<comment>WARNING: Code has been reformatted and moved.
 
 Some files have been renamed and added to GIT. Please git status/diff and commit.
 
