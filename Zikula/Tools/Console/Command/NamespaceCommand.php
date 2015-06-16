@@ -68,10 +68,10 @@ EOF
             /** @var \SplFileInfo $file */
             $output->writeln("<info>Processing {$file->getRealPath()}</info>");
             try {
-                $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
-                $importTraverser = new \PHPParser_NodeTraverser();
-                $traverser = new \PHPParser_NodeTraverser();
-                $prettyPrinter = new \PHPParserPSR2_Printer();
+                $parser = new \PhpParser\Parser(new \PhpParser\Lexer());
+                $importTraverser = new \PhpParser\NodeTraverser();
+                $traverser = new \PhpParser\NodeTraverser();
+                $prettyPrinter = new \PhpParser\PrettyPrinter\Standard;
 
                 $importTraverser->addVisitor($oc = new Visitor\ObjectVisitor());
 
@@ -100,7 +100,7 @@ EOF
                     `git mv {$file->getRealPath()} {$fileName}.php`;
                     $output->writeln("<comment>Renamed {$file->getRealPath()} to {$fileName}.php</comment>");
                 }
-            } catch (\PHPParser_Error $e) {
+            } catch (\PhpParser\Error $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
         }

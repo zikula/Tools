@@ -2,7 +2,7 @@
 
 namespace Zikula\Tools\Console\Command\Visitor;
 
-class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
+class NamespaceVisitor extends \PhpParser\NodeVisitorAbstract
 {
     private $imports = array();
 
@@ -25,9 +25,9 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
         $this->moduleDirectory = $md;
     }
 
-    public function leaveNode(\PHPParser_Node $node)
+    public function leaveNode(\PhpParser\Node $node)
     {
-        if ($node instanceof \PHPParser_Node_Stmt_Class) {
+        if ($node instanceof \PhpParser\Node\Stmt\Class_) {
             // extract file level docblock if one exists
             $attributes = $node->getAttributes();
             $comments = isset($attributes['comments']) ? $attributes['comments'] : array();
@@ -72,20 +72,20 @@ class NamespaceVisitor extends \PHPParser_NodeVisitorAbstract
                 return $node;
             }
 
-            $use = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("
+            $use = new \PhpParser\Node\Stmt\UseUse(new \PhpParser\Node\Name("
 namespace {$this->vendor}\\$namespace;
 "));
 
-            $comment = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("
+            $comment = new \PhpParser\Node\Stmt\UseUse(new \PhpParser\Node\Name("
 $fileDocBlock"));
 
             // build use import statements
             $return = array($comment, $use);
             foreach ($this->imports as $import) {
-                $return[] = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name("use $import;"));
+                $return[] = new \PhpParser\Node\Stmt\UseUse(new \PhpParser\Node\Name("use $import;"));
             }
 
-            $return[] = new \PHPParser_Node_Stmt_UseUse(new \PHPParser_Node_Name(""));
+            $return[] = new \PhpParser\Node\Stmt\UseUse(new \PhpParser\Node\Name(""));
 
             $return[] = $node;
 

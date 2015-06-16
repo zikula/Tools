@@ -58,16 +58,16 @@ EOF
             try {
                 $code = file_get_contents($file->getRealPath());
 
-                $parser = new \PHPParser_Parser(new \PHPParser_Lexer());
-                $traverser = new \PHPParser_NodeTraverser();
-                $prettyPrinter = new \PHPParserPSR2_Printer();
+                $parser = new \PhpParser\Parser(new \PhpParser\Lexer());
+                $traverser = new \PhpParser\NodeTraverser();
+                $prettyPrinter = new \PhpParser\PrettyPrinter\Standard;
                 $traverser->addVisitor(new Visitor\ControllerActionVisitor());
                 $stmts = $parser->parse($code);
                 $stmts = $traverser->traverse($stmts);
 
                 $code = '<?php'."\n".$prettyPrinter->prettyPrint($stmts);
                 file_put_contents($file->getRealPath(), $code);
-            } catch (\PHPParser_Error $e) {
+            } catch (\PhpParser\Error $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
         }

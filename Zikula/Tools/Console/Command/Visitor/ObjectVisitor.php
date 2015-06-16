@@ -2,7 +2,7 @@
 
 namespace Zikula\Tools\Console\Command\Visitor;
 
-class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
+class ObjectVisitor extends \PhpParser\NodeVisitorAbstract
 {
     private $imports = array();
 
@@ -15,22 +15,22 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
      * Gathers all class references within the class so
      * an appropriate import can be written.
      *
-     * @param \PHPParser_Node $node
+     * @param \PhpParser\Node $node
      *
-     * @return \PHPParser_Node|\PHPParser_Node_Param|void
+     * @return \PhpParser\Node|\PhpParser\Node\Param|void
      */
-    public function leaveNode(\PHPParser_Node $node)
+    public function leaveNode(\PhpParser\Node $node)
     {
-        if ($node instanceof \PHPParser_Node_Expr_Instanceof ||
-            $node instanceof \PHPParser_Node_Expr_ClassConstFetch ||
-            $node instanceof \PHPParser_Node_Expr_New ||
-            $node instanceof \PHPParser_Node_Expr_StaticCall) {
+        if ($node instanceof \PhpParser\Node\Expr\Instanceof_ ||
+            $node instanceof \PhpParser\Node\Expr\ClassConstFetch ||
+            $node instanceof \PhpParser\Node\Expr\New_ ||
+            $node instanceof \PhpParser\Node\Expr\StaticCall) {
             $name = $node->class->parts[0];
             if ('self' === $name || 'parent' === $name || 'static' === $name) {
                 return $node;
             }
             $this->imports[$name] = $name;
-        } elseif ($node instanceof \PHPParser_Node_Stmt_Class) {
+        } elseif ($node instanceof \PhpParser\Node\Stmt\Class_) {
             // handle extends
             if (isset($node->extends)) {
                 $name = $node->extends->parts[0];
@@ -48,11 +48,11 @@ class ObjectVisitor extends \PHPParser_NodeVisitorAbstract
                     }
                 }
             }
-        } elseif ($node instanceof \PHPParser_Node_Param) {
+        } elseif ($node instanceof \PhpParser\Node\Param) {
             if (isset($node->class->parts[0])) {
                 $this->imports[$node->type->parts[0]] = $node->type->parts[0];
             }
-        } elseif ($node instanceof \PHPParser_Node_Stmt_Throw) {
+        } elseif ($node instanceof \PhpParser\Node\Stmt\Throw_) {
             $this->imports[$node->expr->class->parts[0]] = $node->expr->class->parts[0];
         }
 
