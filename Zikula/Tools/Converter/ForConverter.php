@@ -18,98 +18,99 @@ use Zikula\Tools\ConverterAbstract;
  */
 class ForConverter extends ConverterAbstract
 {
-	// Lookup tables for performing some token
-	// replacements not addressed in the grammar.
-	private $replacements = array(
-		'smarty\.foreach.*\.index' => 'loop.index0',
-		'smarty\.foreach.*\.iteration' => 'loop.index'
-	);
+    // Lookup tables for performing some token
+    // replacements not addressed in the grammar.
+    private $replacements = array(
+        'smarty\.foreach.*\.index' => 'loop.index0',
+        'smarty\.foreach.*\.iteration' => 'loop.index'
+    );
 
-	public function convert(\SplFileInfo $file, $content)
-	{
-		$content = $this->replaceFor($content);
-		$content = $this->replaceEndForEach($content);
-		$content = $this->replaceForEachElse($content);
+    public function convert(\SplFileInfo $file, $content)
+    {
+        $content = $this->replaceFor($content);
+        $content = $this->replaceEndForEach($content);
+        $content = $this->replaceForEachElse($content);
 
-		foreach ($this->replacements as $k=>$v) {
-			$content = preg_replace('/'.$k.'/', $v, $content);
-		}
+        foreach ($this->replacements as $k => $v) {
+            $content = preg_replace('/' . $k . '/', $v, $content);
+        }
 
-		return $content;
-	}
+        return $content;
+    }
 
-	public function getPriority()
-	{
-		return 50;
-	}
+    private function replaceFor($content)
+    {
 
-	public function getName()
-	{
-		return 'for';
-	}
+        // $pattern = "#\{foreach\b\s*(?:(?!}).)+?\}#";
+        $pattern = "#\{foreach\b\s*([^{}]+)?\}#i";
+        $string = '{% for :key :item in :from %}';
 
-	public function getDescription()
-	{
-		return 'Convert foreach/foreachelse to twig';
-	}
+        return preg_replace_callback($pattern, function ($matches) use ($string) {
 
-	private function replaceEndForEach($content)
-	{
-		$search = "#\{/foreach\s*\}#";
-		$replace = "{% endfor %}";
-		return preg_replace($search,$replace,$content);
-	}
+            $match = $matches[1];
+            $search = $matches[0];
+            $replace = array();
 
-	private function replaceForEachElse($content)
-	{
-		$search = "#\{foreachelse\s*\}#";
-		$replace = "{% else %}";
-		return preg_replace($search,$replace,$content);
-	}
+            // {foreach $users as $user}
+            if (preg_match("/(.*)(?:as)(.*)/i", $match, $mcs)) {
 
-	private function replaceFor($content){
+                // {foreach $users as $k => $val}
+                if (preg_match("/(.*)\=\>(.*)/", $mcs[2], $match)) {
+                    $replace['key'] .= $this->variable($match[1]) . ',';
+                    $mcs[2] = $match[2];
+                }
+                $replace['item'] = $this->variable($mcs[2]);
+                $replace['from'] = $this->variable($mcs[1]);
 
-		// $pattern = "#\{foreach\b\s*(?:(?!}).)+?\}#";
-		$pattern = "#\{foreach\b\s*([^{}]+)?\}#i";
-		$string  = '{% for :key :item in :from %}';
+            } else {
 
-		return preg_replace_callback($pattern, function($matches) use( $string ) {
+                $attr = $this->attributes($match);
 
-			$match   = $matches[1];
-			$search  = $matches[0];
-			$replace = array();
+                if ($attr['key']) {
+                    $replace['key'] = $attr['key'] . ',';
+                }
 
-			// {foreach $users as $user}
-			if (preg_match("/(.*)(?:as)(.*)/i", $match,$mcs)) {
+                $replace['item'] = $this->variable($attr['item']);
+                $replace['from'] = $this->variable($attr['from']);
+            }
 
-				// {foreach $users as $k => $val}
-				if (preg_match("/(.*)\=\>(.*)/", $mcs[2],$match)) {
-					$replace['key'] .= $this->variable($match[1]).',';
-					$mcs[2] = $match[2];
-				} 
-				$replace['item'] = $this->variable($mcs[2]);
-				$replace['from'] = $this->variable($mcs[1]);
+            $string = $this->vsprintf($string, $replace);
+            // Replace more than one space to single space
+            $string = preg_replace('!\s+!', ' ', $string);
 
-			} else {
+            return str_replace($search, $string, $search);
 
-				$attr = $this->attributes($match);
+        }, $content);
 
-				if ($attr['key']) {
-					$replace['key'] = $attr['key'].',';
-				}
+    }
 
-				$replace['item'] = $this->variable($attr['item']);
-				$replace['from'] = $this->variable($attr['from']);
-			}
+    private function replaceEndForEach($content)
+    {
+        $search = "#\{/foreach\s*\}#";
+        $replace = "{% endfor %}";
+        return preg_replace($search, $replace, $content);
+    }
 
-			$string  = $this->vsprintf($string,$replace);
-	        // Replace more than one space to single space
-	        $string = preg_replace('!\s+!', ' ', $string);
+    private function replaceForEachElse($content)
+    {
+        $search = "#\{foreachelse\s*\}#";
+        $replace = "{% else %}";
+        return preg_replace($search, $replace, $content);
+    }
 
-	        return str_replace($search, $string, $search);
+    public function getPriority()
+    {
+        return 50;
+    }
 
-		}, $content);
+    public function getName()
+    {
+        return 'for';
+    }
 
-	}
+    public function getDescription()
+    {
+        return 'Convert foreach/foreachelse to twig';
+    }
 
 }

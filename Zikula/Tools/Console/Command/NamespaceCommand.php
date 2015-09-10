@@ -3,7 +3,6 @@
 namespace Zikula\Tools\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,20 +16,20 @@ class NamespaceCommand extends Command
             ->setName('module:ns')
             ->setDescription('Namespaces module')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be current directory e.g. dir=.'
-        )
+                'Target directory is mandatory - should be current directory e.g. dir=.'
+            )
             ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
-                        'Vendor name mandatory'
-        )
+                'Vendor name mandatory'
+            )
             ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
-                        'Module name mandatory - should be new module name'
-        )
+                'Module name mandatory - should be new module name'
+            )
             ->setHelp(<<<EOF
 The <info>module:ns</info> command converts to namespaced classes</info>
 
 <info>zikula-tools module:ns --dir=. --vendor=Acme --module-name=WidgetModule</info>
 EOF
-        );
+            );
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -88,12 +87,12 @@ EOF
                 $nsc->setImports($oc->getImports());
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php'."\r\n".$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php' . "\r\n" . $prettyPrinter->prettyPrint($stmts);
                 $s = end($stmts);
                 $output->writeln("<info>Writing {$file->getRealPath()}</info>");
                 file_put_contents($file->getRealPath(), $code);
                 $pos = strrpos($file->getRealPath(), DIRECTORY_SEPARATOR);
-                $fileName = substr($file->getRealPath(), 0, $pos).DIRECTORY_SEPARATOR.$s->name;
+                $fileName = substr($file->getRealPath(), 0, $pos) . DIRECTORY_SEPARATOR . $s->name;
                 $isInstaller = substr($file->getFilename(), -19) == 'ModuleInstaller.php';
                 $isVersion = substr($file->getFilename(), -17) == 'ModuleVersion.php';
                 if (($file->getRealPath() !== "{$fileName}.php") && !$isInstaller && !$isVersion) {

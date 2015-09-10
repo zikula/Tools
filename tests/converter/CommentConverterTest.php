@@ -12,8 +12,8 @@
 namespace sankar\ST\Tests\Converter;
 
 use sankar\ST\Converter;
-use sankar\ST\ConverterAbstract;
 use sankar\ST\Converter\CommentConverter;
+use sankar\ST\ConverterAbstract;
 
 /**
  * @author sankara <sankar.suda@gmail.com>
@@ -26,28 +26,29 @@ class CommentconverterTest extends \PHPUnit_Framework_TestCase
     {
         $this->converter = new CommentConverter();
     }
+
     /**
-     * @covers sankar\ST\Converter\CommentConverter::convert
+     * @covers       sankar\ST\Converter\CommentConverter::convert
      * @dataProvider Provider
      */
-    public function testThatIfIsConverted($smarty,$twig)
+    public function testThatIfIsConverted($smarty, $twig)
     {
 
         // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-       
+
     }
 
     public function Provider()
     {
         return array(
-                array( 
-                        '{* foo *}',
-                        '{# foo #}'
-                    )
-            );
+            array(
+                '{* foo *}',
+                '{# foo #}'
+            )
+        );
     }
 
     /**

@@ -24,7 +24,8 @@ class ObjectVisitor extends \PhpParser\NodeVisitorAbstract
         if ($node instanceof \PhpParser\Node\Expr\Instanceof_ ||
             $node instanceof \PhpParser\Node\Expr\ClassConstFetch ||
             $node instanceof \PhpParser\Node\Expr\New_ ||
-            $node instanceof \PhpParser\Node\Expr\StaticCall) {
+            $node instanceof \PhpParser\Node\Expr\StaticCall
+        ) {
             $name = $node->class->parts[0];
             if ('self' === $name || 'parent' === $name || 'static' === $name) {
                 return $node;
@@ -35,7 +36,7 @@ class ObjectVisitor extends \PhpParser\NodeVisitorAbstract
             if (isset($node->extends)) {
                 $name = $node->extends->parts[0];
                 if (false === strpos($name, '\\')) {
-                    $node->extends->parts[0] = '\\'.$name;
+                    $node->extends->parts[0] = '\\' . $name;
                 }
             }
 
@@ -44,7 +45,7 @@ class ObjectVisitor extends \PhpParser\NodeVisitorAbstract
                 foreach ($node->implements as $k => $value) {
                     $name = $node->implements[$k]->parts[0];
                     if (false === strpos($name, '\\')) {
-                        $node->implements[$k]->parts[0] = '\\'.$name;
+                        $node->implements[$k]->parts[0] = '\\' . $name;
                     }
                 }
             }

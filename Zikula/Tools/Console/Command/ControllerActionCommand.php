@@ -3,7 +3,6 @@
 namespace Zikula\Tools\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,16 +16,16 @@ class ControllerActionCommand extends Command
             ->setName('module:controller_actions')
             ->setDescription('Adds "Action" suffix to all public controller methods in specified controller directory')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be the Controller folder of a module e.g. dir=./Controller')
+                'Target directory is mandatory - should be the Controller folder of a module e.g. dir=./Controller')
             ->addOption('force', null, InputOption::VALUE_NONE,
-                        'must require --force'
-        )
+                'must require --force'
+            )
             ->setHelp(<<<EOF
 The <info>module:controller_actions</info> command refactors controller methods with Action suffix.
 
 <info>zikula-tools module:controller_actions --dir=./Controller --force</info>
 EOF
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -42,7 +41,7 @@ EOF
             exit(1);
         }
 
-        $force = (bool) $input->getOption('force');
+        $force = (bool)$input->getOption('force');
 
         $finder = new Finder();
         $finder->in($dir)
@@ -65,7 +64,7 @@ EOF
                 $stmts = $parser->parse($code);
                 $stmts = $traverser->traverse($stmts);
 
-                $code = '<?php'."\n".$prettyPrinter->prettyPrint($stmts);
+                $code = '<?php' . "\n" . $prettyPrinter->prettyPrint($stmts);
                 file_put_contents($file->getRealPath(), $code);
             } catch (\PhpParser\Error $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");

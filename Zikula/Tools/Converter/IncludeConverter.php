@@ -19,62 +19,62 @@ use Zikula\Tools\ConverterAbstract;
 class IncludeConverter extends ConverterAbstract
 {
 
-	public function convert(\SplFileInfo $file, $content)
-	{
-		return $this->replace($content);
-	}
+    public function convert(\SplFileInfo $file, $content)
+    {
+        return $this->replace($content);
+    }
 
-	public function getPriority()
-	{
-		return 100;
-	}
+    private function replace($content)
+    {
+        $pattern = '/\{include\b\s*([^{}]+)?\}/';
+        $string = '{% include :template :with :vars %}';
 
-	public function getName()
-	{
-		return 'include';
-	}
+        return preg_replace_callback($pattern, function ($matches) use ($string) {
 
-	public function getDescription()
-	{
-		return 'Convert smarty include to twig include';
-	}
+            $match = $matches[1];
+            $attr = $this->attributes($match);
 
-	private function replace($content)
-	{
-		$pattern = '/\{include\b\s*([^{}]+)?\}/';
-		$string = '{% include :template :with :vars %}';
+            $replace = array();
+            $replace['template'] = $attr['file'];
 
-		return preg_replace_callback($pattern, function($matches) use ($string) {
+            // If we have any other variables
+            if (count($attr) > 1) {
+                $replace['with'] = 'with';
+                unset($attr['file']); // We won't need in vars
 
-	        $match   = $matches[1];
-	        $attr    = $this->attributes($match);
+                $vars = array();
+                foreach ($attr as $key => $value) {
+                    $value = $this->value($value);
+                    $vars[] = "'" . $key . "' : " . $value;
+                }
 
-	        $replace = array();
-	        $replace['template'] = $attr['file'];
+                $replace['vars'] = '{' . implode(', ', $vars) . '}';
+            }
 
-	        // If we have any other variables
-	        if (count($attr) > 1) {
-	            $replace['with'] = 'with';
-	            unset($attr['file']); // We won't need in vars
+            $string = $this->vsprintf($string, $replace);
 
-	             $vars = array();
-	            foreach ($attr as $key => $value) {
-	            	$value  = $this->value($value);
-	                $vars[] = "'".$key."' : ".$value;
-	            }
+            // Replace more than one space to single space
+            $string = preg_replace('!\s+!', ' ', $string);
 
-	            $replace['vars'] = '{'.implode(', ',$vars).'}';
-	        }
+            return str_replace($matches[0], $string, $matches[0]);
 
-	        $string  = $this->vsprintf($string,$replace);
+        }, $content);
 
-	        // Replace more than one space to single space
-	        $string = preg_replace('!\s+!', ' ', $string);
+    }
 
-	        return str_replace($matches[0], $string, $matches[0]);
+    public function getPriority()
+    {
+        return 100;
+    }
 
-	      },$content);
+    public function getName()
+    {
+        return 'include';
+    }
 
-	}
+    public function getDescription()
+    {
+        return 'Convert smarty include to twig include';
+    }
 
 }

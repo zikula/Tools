@@ -18,97 +18,96 @@ use Zikula\Tools\ConverterAbstract;
  */
 class IfConverter extends ConverterAbstract
 {
-	private $alt = array(
-			'gt'  => '>',
-			'lt'  => '<',
-			'eq'  => '==',
-			'neq' => '!=',
-			'ne'  => '!=',
-			'not' => '!',
-			'mod' => '%',
-			'or'  => '||',
-			'and' => '&&'
-	);
+    private $alt = array(
+        'gt' => '>',
+        'lt' => '<',
+        'eq' => '==',
+        'neq' => '!=',
+        'ne' => '!=',
+        'not' => '!',
+        'mod' => '%',
+        'or' => '||',
+        'and' => '&&'
+    );
 
-	public function convert(\SplFileInfo $file, $content)
-	{
-		// Replace {if }
-		$content = $this->replaceIf($content);
-		// Replace {elseif }
-		$content = $this->replaceElseIf($content);
-		// Replace {else}
-		$content = preg_replace('#\{/if\s*\}#', "{% endif %}", $content);
-		// Replace {/if}
-		$content = preg_replace('#\{else\s*\}#', "{% else %}", $content);
+    public function convert(\SplFileInfo $file, $content)
+    {
+        // Replace {if }
+        $content = $this->replaceIf($content);
+        // Replace {elseif }
+        $content = $this->replaceElseIf($content);
+        // Replace {else}
+        $content = preg_replace('#\{/if\s*\}#', "{% endif %}", $content);
+        // Replace {/if}
+        $content = preg_replace('#\{else\s*\}#', "{% else %}", $content);
 
-		return $content;
-	}
+        return $content;
+    }
 
-	public function getPriority()
-	{
-		return 50;
-	}
+    private function replaceIf($content)
+    {
 
-	public function getName()
-	{
-		return 'if';
-	}
+        $pattern = "#\{if\b\s*([^{}]+)?\}#i";
+        $string = '{%% if %s %%}';
 
-	public function getDescription()
-	{
-		return 'Convert smarty if/else/elseif to twig';
-	}
+        return $this->replace($pattern, $content, $string);
+    }
 
-	private function replaceIf($content)
-	{
+    private function replace($pattern, $content, $string)
+    {
+        return preg_replace_callback($pattern, function ($matches) use ($string) {
 
-		$pattern = "#\{if\b\s*([^{}]+)?\}#i";
-		$string  = '{%% if %s %%}';
+            $match = $matches[1];
+            $search = $matches[0];
 
-		return $this->replace($pattern, $content, $string);
-	}
+            foreach ($this->alt as $key => $value) {
+                $match = str_replace(" $key ", " $value ", $match);
+            }
 
-	private function replaceElseIf($content)
-	{
+            // Replace $vars
+            $match = $this->replaceVariable($match);
 
-		$pattern = "#\{elseif\b\s*([^{}]+)?\}#i";
-		$string  = '{%% elseif %s %%}';
+            $string = sprintf($string, $match);
 
-		return $this->replace($pattern, $content, $string);
+            return str_replace($search, $string, $search);
 
-	}
+        }, $content);
+    }
 
+    private function replaceVariable($string)
+    {
+        $pattern = '/\$([\w\.\-\>\[\]]+)/';
+        return preg_replace_callback($pattern, function ($matches) {
+            // Convert Object to dot
+            $matches[1] = str_replace('->', '.', $matches[1]);
 
-	private function replace($pattern, $content, $string)
-	{
-		return preg_replace_callback($pattern, function($matches) use ($string) {
+            return str_replace($matches[0], $matches[1], $matches[0]);
 
-				$match   = $matches[1];
-				$search  = $matches[0];
+        }, $string);
+    }
 
-				foreach ($this->alt as $key => $value) {
-					$match = str_replace(" $key ", " $value ", $match);
-				}
+    private function replaceElseIf($content)
+    {
 
-				// Replace $vars
-				$match = $this->replaceVariable($match);
+        $pattern = "#\{elseif\b\s*([^{}]+)?\}#i";
+        $string = '{%% elseif %s %%}';
 
-				$string = sprintf($string,$match);
-				
-				return str_replace($search, $string, $search);
+        return $this->replace($pattern, $content, $string);
 
-			}, $content);
-	}
+    }
 
-	private function replaceVariable($string)
-	{
-		$pattern = '/\$([\w\.\-\>\[\]]+)/';
-		return preg_replace_callback($pattern, function($matches) {
-			// Convert Object to dot
-	        $matches[1] = str_replace('->', '.',$matches[1]);
+    public function getPriority()
+    {
+        return 50;
+    }
 
-			return str_replace($matches[0],$matches[1],$matches[0]);
-			
-		}, $string);
-	}
+    public function getName()
+    {
+        return 'if';
+    }
+
+    public function getDescription()
+    {
+        return 'Convert smarty if/else/elseif to twig';
+    }
 }

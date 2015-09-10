@@ -19,7 +19,7 @@ class Compiler
 
         // CLI Component files
         foreach ($this->getFiles() as $file) {
-            $path = str_replace(__DIR__.'/', '', $file);
+            $path = str_replace(__DIR__ . '/', '', $file);
             $phar->addFromString($path, file_get_contents($file));
         }
         $this->addPhpCsFixer($phar);
@@ -34,6 +34,13 @@ class Compiler
         unset($phar);
 
         chmod($pharFile, 0755);
+    }
+
+    protected function getFiles()
+    {
+        $iterator = Finder::create()->files()->exclude('Tests')->name('*.php')->in(array('vendor', 'Zikula'));
+
+        return array_merge(array('LICENSE'), iterator_to_array($iterator));
     }
 
     /**
@@ -65,12 +72,5 @@ class Compiler
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */';
-    }
-
-    protected function getFiles()
-    {
-        $iterator = Finder::create()->files()->exclude('Tests')->name('*.php')->in(array('vendor', 'Zikula'));
-
-        return array_merge(array('LICENSE'), iterator_to_array($iterator));
     }
 }

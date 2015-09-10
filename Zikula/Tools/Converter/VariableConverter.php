@@ -19,45 +19,45 @@ use Zikula\Tools\ConverterAbstract;
 class VariableConverter extends ConverterAbstract
 {
 
-	public function convert(\SplFileInfo $file, $content)
-	{
-		$content = $this->replace($content);
+    public function convert(\SplFileInfo $file, $content)
+    {
+        $content = $this->replace($content);
 
-		return $content;
-	}
+        return $content;
+    }
 
-	public function getPriority()
-	{
-		return 100;
-	}
+    private function replace($content)
+    {
+        $pattern = '/\{\$([\w\.\-\>\[\]]+)\}/';
+        return preg_replace_callback($pattern, function ($matches) {
 
-	public function getName()
-	{
-		return 'variable';
-	}
+            $match = $matches[1];
+            $search = $matches[0];
 
-	public function getDescription()
-	{
-		return 'Convert smarty variable {$var.name} to twig {{ var.name }}';
-	}
+            // Convert Object to dot
+            $match = str_replace('->', '.', $match);
 
-	private function replace($content)
-	{
-		$pattern = '/\{\$([\w\.\-\>\[\]]+)\}/';
-		return preg_replace_callback($pattern, function($matches) {
+            $search = str_replace($search, '{{ ' . $match . ' }}', $search);
 
-	        $match   = $matches[1];
-	        $search  = $matches[0];
+            return $search;
 
-	        // Convert Object to dot
-	        $match = str_replace('->', '.', $match);
+        }, $content);
 
-	        $search  = str_replace($search, '{{ '.$match.' }}', $search);
+    }
 
-	       return $search; 
+    public function getPriority()
+    {
+        return 100;
+    }
 
-   		},$content);
+    public function getName()
+    {
+        return 'variable';
+    }
 
-	}
+    public function getDescription()
+    {
+        return 'Convert smarty variable {$var.name} to twig {{ var.name }}';
+    }
 
 }

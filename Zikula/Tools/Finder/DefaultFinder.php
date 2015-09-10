@@ -33,8 +33,17 @@ class DefaultFinder extends Finder implements FinderInterface
             ->exclude('vendor')
             ->filter(function (\SplFileInfo $file) use ($files) {
                 return !in_array($file->getRelativePathname(), $files);
-            })
-        ;
+            });
+    }
+
+    /**
+     * Excludes files because modifying them would break (mainly useful for fixtures in unit tests).
+     *
+     * @return array
+     */
+    protected function getFilesToExclude()
+    {
+        return array();
     }
 
     public function setDir($dir)
@@ -50,15 +59,5 @@ class DefaultFinder extends Finder implements FinderInterface
     protected function getDirs($dir)
     {
         return array($dir);
-    }
-
-    /**
-     * Excludes files because modifying them would break (mainly useful for fixtures in unit tests).
-     *
-     * @return array
-     */
-    protected function getFilesToExclude()
-    {
-        return array();
     }
 }

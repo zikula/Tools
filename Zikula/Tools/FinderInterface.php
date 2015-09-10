@@ -16,5 +16,5 @@ namespace Zikula\Tools;
  */
 interface FinderInterface
 {
-	public function setDir($dir);
+    public function setDir($dir);
 }

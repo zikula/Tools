@@ -22,6 +22,6 @@ class Application extends BaseApplication
 
     public function getLongVersion()
     {
-        return parent::getLongVersion().' by <comment>Drak</comment>';
+        return parent::getLongVersion() . ' by <comment>Drak</comment>';
     }
 }

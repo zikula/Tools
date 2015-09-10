@@ -12,8 +12,8 @@
 namespace sankar\ST\Tests\Converter;
 
 use sankar\ST\Converter;
-use sankar\ST\ConverterAbstract;
 use sankar\ST\Converter\IncludeConverter;
+use sankar\ST\ConverterAbstract;
 
 /**
  * @author sankara <sankar.suda@gmail.com>
@@ -26,31 +26,32 @@ class IncludeConverterTest extends \PHPUnit_Framework_TestCase
     {
         $this->converter = new IncludeConverter();
     }
+
     /**
-     * @covers sankar\ST\Converter\IncludeConverter::convert
+     * @covers       sankar\ST\Converter\IncludeConverter::convert
      * @dataProvider Provider
      */
-    public function testThatIncludeIsConverted($smarty,$twig)
+    public function testThatIncludeIsConverted($smarty, $twig)
     {
 
         // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-       
+
     }
 
     public function Provider()
     {
         return array(
-                array( 
-                        "{include file='page_header.tpl'}"
+            array(
+                "{include file='page_header.tpl'}"
                         "{% include 'page_header.tpl' %}"
                     ),
                 array(
-                        '{include file=\'footer.tpl\' foo=\'bar\' links=$links}',
-                        '{% include \'footer.tpl\' with {\'foo\' : \'bar\', links : links} %}'
-                    )
+                    '{include file=\'footer.tpl\' foo=\'bar\' links=$links}',
+                    '{% include \'footer.tpl\' with {\'foo\' : \'bar\', links : links} %}'
+                )
             );
     }
 

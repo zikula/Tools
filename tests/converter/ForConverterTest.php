@@ -12,8 +12,8 @@
 namespace sankar\ST\Tests\Converter;
 
 use sankar\ST\Converter;
-use sankar\ST\ConverterAbstract;
 use sankar\ST\Converter\ForConverter;
+use sankar\ST\ConverterAbstract;
 
 /**
  * @author sankara <sankar.suda@gmail.com>
@@ -26,40 +26,41 @@ class ForConverterTest extends \PHPUnit_Framework_TestCase
     {
         $this->converter = new ForConverter();
     }
+
     /**
-     * @covers sankar\ST\Converter\ForConverter::convert
+     * @covers       sankar\ST\Converter\ForConverter::convert
      * @dataProvider Provider
      */
-    public function testThatForIsConverted($smarty,$twig)
+    public function testThatForIsConverted($smarty, $twig)
     {
 
         // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-       
+
     }
 
     public function Provider()
     {
         return array(
-                array( 
-                        '{foreach $myColors as $color}\nfoo{/foreach}',
-                        '{% for color in myColors %}\nfoo\n{% endfor %}'
-                    ),
-                array(
-                        '{foreach $contact as $key => $value}\nfoo{/foreach}',
-                        '{% for key,value in contact %}\nfoo{% endfor %}'
-                    ),
-                array( 
-                        '{foreach name=outer item=contact from=$contacts}\nfoo{/foreach}',
-                        '{% for contact in contacts %}\nfoo{% endfor %}'
-                    ), 
-                array(
-                        '{foreach key=key item=item from=$contact}\nfoo\n{foreachelse}bar{/foreach}',
-                        '{% for key,item in contact %}\nfoo\n{% else %}bar{% endfor %}'
-                    ),
-            );
+            array(
+                '{foreach $myColors as $color}\nfoo{/foreach}',
+                '{% for color in myColors %}\nfoo\n{% endfor %}'
+            ),
+            array(
+                '{foreach $contact as $key => $value}\nfoo{/foreach}',
+                '{% for key,value in contact %}\nfoo{% endfor %}'
+            ),
+            array(
+                '{foreach name=outer item=contact from=$contacts}\nfoo{/foreach}',
+                '{% for contact in contacts %}\nfoo{% endfor %}'
+            ),
+            array(
+                '{foreach key=key item=item from=$contact}\nfoo\n{foreachelse}bar{/foreach}',
+                '{% for key,item in contact %}\nfoo\n{% else %}bar{% endfor %}'
+            ),
+        );
     }
 
     /**

@@ -1,4 +1,3 @@
-
 {include file='page_header.tpl'}
 
 {* body of template goes here, the $tpl_name variable

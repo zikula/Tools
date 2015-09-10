@@ -3,11 +3,9 @@
 namespace Zikula\Tools\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 
 class RestructureThemeCommand extends Command
 {
@@ -17,23 +15,23 @@ class RestructureThemeCommand extends Command
             ->setName('theme:restructure')
             ->setDescription('Creates and moves structure')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED,
-                        'Target directory is mandatory - should be theme directory'
-        )
+                'Target directory is mandatory - should be theme directory'
+            )
             ->addOption('vendor', null, InputOption::VALUE_REQUIRED,
-                        'Vendor name mandatory'
-        )
+                'Vendor name mandatory'
+            )
             ->addOption('module-name', null, InputOption::VALUE_REQUIRED,
-                        'Theme name mandatory - should be theme directory name'
-        )
+                'Theme name mandatory - should be theme directory name'
+            )
             ->addOption('force', null, InputOption::VALUE_NONE,
-                        'Force - without this, nothing will be done.'
-        )
+                'Force - without this, nothing will be done.'
+            )
             ->setHelp(<<<EOF
 The <info>theme:restructure</info> command migrates resources</info>
 
 <info>zikula-tools theme:restructure --dir=theme/MyTheme --theme=MyTheme</info>
 EOF
-        );
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -62,7 +60,7 @@ EOF
             exit(1);
         }
 
-        $force = (bool) $input->getOption('force');
+        $force = (bool)$input->getOption('force');
         if (false === $force && file_exists("$dir/{$themeDir}Theme.php")) {
             $output->writeln('<error>Looks like this theme has already been restructured.</error>');
             exit(1);
@@ -74,8 +72,8 @@ EOF
         }
         chdir($dir);
 
-        if (!is_dir($dir.'/Resources/public')) {
-            if (mkdir($dir.'/Resources/public', 0755, true)) {
+        if (!is_dir($dir . '/Resources/public')) {
+            if (mkdir($dir . '/Resources/public', 0755, true)) {
                 $output->writeln("<info>Created $dir/Resources/public</info>");
             } else {
                 $output->writeln("<error>Failed to create $dir/Resources/public</error>");
@@ -85,37 +83,37 @@ EOF
             }
         }
 
-        if (is_dir($dir.'/style')) {
+        if (is_dir($dir . '/style')) {
             `git mv $dir/style $dir/Resources/public/css`;
             $output->writeln("<info>moved $dir/style to $dir/Resources/public/css</info>");
         }
 
-        if (is_dir($dir.'/javascript')) {
+        if (is_dir($dir . '/javascript')) {
             `git mv $dir/javascript $dir/Resources/public/js`;
             $output->writeln("<info>moved $dir/javascript to $dir/Resources/public/js</info>");
         }
 
-        if (is_dir($dir.'/images')) {
+        if (is_dir($dir . '/images')) {
             `git mv $dir/images $dir/Resources/public`;
             $output->writeln("<info>moved $dir/images to $dir/Resources/public/images</info>");
         }
 
-        if (is_dir($dir.'/docs')) {
+        if (is_dir($dir . '/docs')) {
             `git mv $dir/docs $dir/Resources/docs`;
             $output->writeln("<info>moved $dir/docs to $dir/Resources/public/docs</info>");
         }
 
-        if (is_dir($dir.'/locale')) {
+        if (is_dir($dir . '/locale')) {
             `git mv $dir/locale $dir/Resources`;
             $output->writeln("<info>moved $dir/locale to $dir/Resources/public/locale</info>");
         }
 
-        if (is_dir($dir.'/templates')) {
+        if (is_dir($dir . '/templates')) {
             `git mv $dir/templates $dir/Resources/views`;
             $output->writeln("<info>moved $dir/templates to $dir/Resources/public/views</info>");
         }
 
-        if (is_dir($dir.'/lib/'.$themeDir)) {
+        if (is_dir($dir . '/lib/' . $themeDir)) {
             `mv $dir/lib/$themeDir/* $dir`;
             `git add $dir/*`;
 

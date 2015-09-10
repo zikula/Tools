@@ -12,8 +12,8 @@
 namespace sankar\ST\Tests\Converter;
 
 use sankar\ST\Converter;
-use sankar\ST\ConverterAbstract;
 use sankar\ST\Converter\VariableConverter;
+use sankar\ST\ConverterAbstract;
 
 /**
  * @author sankara <sankar.suda@gmail.com>
@@ -26,37 +26,38 @@ class CommentconverterTest extends \PHPUnit_Framework_TestCase
     {
         $this->converter = new VariableConverter();
     }
+
     /**
-     * @covers sankar\ST\Converter\VariableConverter::convert
+     * @covers       sankar\ST\Converter\VariableConverter::convert
      * @dataProvider Provider
      */
-    public function testThatVariableIsConverted($smarty,$twig)
+    public function testThatVariableIsConverted($smarty, $twig)
     {
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-       
+
     }
 
     public function Provider()
     {
         return array(
-                array( 
-                    '{$var}','{{ var }}'
-                    ),
-                array(
-                    '{$contacts.fax}','{{ contacts.fax }}'
-                    ),
-                array(
-                    '{$contacts[0]}','{{ contacts[0] }}'
-                    ),
-                array(
-                    '{$contacts[2][0]}','{{ contacts[2][0] }}'
-                    ),
-                array(
-                    '{$person->name}','{{ person.name }}'
-                    )
-            );
+            array(
+                '{$var}', '{{ var }}'
+            ),
+            array(
+                '{$contacts.fax}', '{{ contacts.fax }}'
+            ),
+            array(
+                '{$contacts[0]}', '{{ contacts[0] }}'
+            ),
+            array(
+                '{$contacts[2][0]}', '{{ contacts[2][0] }}'
+            ),
+            array(
+                '{$person->name}', '{{ person.name }}'
+            )
+        );
     }
 
     /**

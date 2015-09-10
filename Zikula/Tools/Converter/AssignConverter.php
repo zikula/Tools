@@ -19,63 +19,63 @@ use Zikula\Tools\ConverterAbstract;
 class AssignConverter extends ConverterAbstract
 {
 
-	public function convert(\SplFileInfo $file, $content)
-	{
-		$content = $this->replace($content);
+    public function convert(\SplFileInfo $file, $content)
+    {
+        $content = $this->replace($content);
 
-		return $content;
-	}
+        return $content;
+    }
 
-	public function getPriority()
-	{
-		return 100;
-	}
+    private function replace($content)
+    {
+        $pattern = '/\{assign\b\s*([^{}]+)?\}/';
+        $string = '{% set :key = :value %}';
 
-	public function getName()
-	{
-		return 'assign';
-	}
+        return preg_replace_callback($pattern, function ($matches) use ($string) {
 
-	public function getDescription()
-	{
-		return "Convert smarty {assign} to twig {% set foo = 'foo' %}";
-	}
+            $match = $matches[1];
+            $attr = $this->attributes($match);
 
-	private function replace($content)
-	{
-		$pattern = '/\{assign\b\s*([^{}]+)?\}/';
-		$string  = '{% set :key = :value %}';
+            $key = $attr['var'];
+            $value = $attr['value'];
 
-		return preg_replace_callback($pattern, function($matches) use ($string) {
+            // Short-hand {assign "name" "Bob"}
+            if (!isset($key)) {
+                reset($attr);
+                $key = key($attr);
+            }
 
-	        $match   = $matches[1];
-	        $attr    = $this->attributes($match);
+            if (!isset($value)) {
+                next($attr);
+                $value = key($attr);
+            }
 
-	        $key   = $attr['var'];
-	        $value = $attr['value'];
+            $value = $this->value($value);
+            $key = $this->variable($key);
 
-	        // Short-hand {assign "name" "Bob"}
-	        if (!isset($key)) {
-	            reset($attr);
-	            $key = key($attr);
-	        }
+            $string = $this->vsprintf($string, array('key' => $key, 'value' => $value));
+            // Replace more than one space to single space
+            $string = preg_replace('!\s+!', ' ', $string);
 
-	        if (!isset($value)) {
-	            next($attr);
-	            $value = key($attr);
-	        }
+            return str_replace($matches[0], $string, $matches[0]);
 
-	        $value = $this->value($value);
-	        $key   = $this->variable($key);
+        }, $content);
 
-	        $string  = $this->vsprintf($string,array('key'=>$key,'value'=>$value));
-	        // Replace more than one space to single space
-	        $string = preg_replace('!\s+!', ' ', $string);	 
-	               
-	        return str_replace($matches[0], $string, $matches[0]);
+    }
 
-	      },$content);
+    public function getPriority()
+    {
+        return 100;
+    }
 
-	}
+    public function getName()
+    {
+        return 'assign';
+    }
+
+    public function getDescription()
+    {
+        return "Convert smarty {assign} to twig {% set foo = 'foo' %}";
+    }
 
 }

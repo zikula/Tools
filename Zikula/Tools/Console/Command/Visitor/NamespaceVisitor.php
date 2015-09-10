@@ -40,29 +40,29 @@ class NamespaceVisitor extends \PhpParser\NodeVisitorAbstract
             if (count($p) == 5) {
                 list($ns, $type, $mid, $last, $name) = $p;
                 $node->name = $name;
-                $ns = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
+                $ns = strcasecmp($ns . 'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 $namespace = "$ns\\$type\\$mid\\$last";
             } elseif (count($p) == 4) {
                 list($ns, $type, $mid, $name) = $p;
                 $node->name = $name;
-                $ns = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
+                $ns = strcasecmp($ns . 'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 $namespace = "$ns\\$type\\$mid";
             } elseif (count($p) == 3) {
                 list($ns, $type, $name) = $p;
-                if (preg_match('/.*'.$type.'$/', $node->name, $matches)) {
+                if (preg_match('/.*' . $type . '$/', $node->name, $matches)) {
                     // handle things like Foo_Controller_AdminController
                     return $node;
                 }
                 $node->name = "{$name}{$type}";
-                $ns = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
+                $ns = strcasecmp($ns . 'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 $namespace = $type ? "$ns\\$type" : $ns;
             } elseif (count($p) == 2) {
                 list($ns, $name) = $p;
-                $namespace = strcasecmp($ns.'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
+                $namespace = strcasecmp($ns . 'Module', $this->moduleDirectory) === 0 ? $this->moduleDirectory : $ns;
                 switch ($name) {
                     case 'Installer':
                     case 'Version':
-                        $node->name = $namespace.$name;
+                        $node->name = $namespace . $name;
                         break;
                     default:
                         $node->name = $name;

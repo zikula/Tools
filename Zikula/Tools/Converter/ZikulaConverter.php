@@ -3,7 +3,7 @@
 /**
  * This file is part of the PHP ST utility.
  *
- * (c) Sankar suda <sankar.suda@gmail.com>
+ * (c) Zikula Team
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -19,72 +19,57 @@ use Zikula\Tools\ConverterAbstract;
  */
 class ZikulaConverter extends ConverterAbstract
 {
-	public function convert(\SplFileInfo $file, $content)
-	{
+    public function convert(\SplFileInfo $file, $content)
+    {
         $content = $this->replaceBlockPosition($content);
         $content = $this->replaceModurl($content);
         $content = $this->replacePageaddvar($content);
         $content = $this->replaceGettext($content);
         $content = $this->replaceMisc($content);
 
-		return $content;
-	}
+        return $content;
+    }
 
-	public function getPriority()
-	{
-		return 0; // lower priority means do later
-	}
+    private function replaceBlockPosition($content)
+    {
+        return preg_replace_callback(
+            "/(\{blockposition name=)([\w]+)(\})/",
+            function ($matches) {
+                return "{{ showblockposition('$matches[2]') }}";
+            },
+            $content);
+    }
 
-	public function getName()
-	{
-		return 'zikula';
-	}
+    private function replaceModurl($content)
+    {
+        return preg_replace_callback(
+            "/(\{modurl)([\s]+)(modname=['|\"]?)([\w][^'|\"]+)(['|\"]?)([\s]+)(type=['|\"]?)([\w][^'|\"]+)(['|\"]?)([\s]+)(func=['|\"]?)([\w][^'|\"]+)(['|\"]?)(\})/",
+            function ($matches) {
+                return "{{ path('" . strtolower($matches[4]) . "_$matches[8]_$matches[12]') }}";
+            },
+            $content);
+    }
 
-	public function getDescription()
-	{
-		return 'Convert zikula-specific smarty tags to compatible twig tags.';
-	}
-
-	private function replaceBlockPosition($content)
-	{
-		return preg_replace_callback(
-			"/(\{blockposition name=)([\w]+)(\})/",
-			function($matches) {
-				return "{{ showblockposition('$matches[2]') }}";
-			},
-			$content);
-	}
-
-	private function replaceModurl($content)
-	{
-		return preg_replace_callback(
-			"/(\{modurl)([\s]+)(modname=['|\"]?)([\w][^'|\"]+)(['|\"]?)([\s]+)(type=['|\"]?)([\w][^'|\"]+)(['|\"]?)([\s]+)(func=['|\"]?)([\w][^'|\"]+)(['|\"]?)(\})/",
-			function($matches) {
-				return "{{ path('" . strtolower($matches[4]) ."_$matches[8]_$matches[12]') }}";
-			},
-			$content);
-	}
-
-	private function replacePageaddvar($content)
-	{
+    private function replacePageaddvar($content)
+    {
         return preg_replace_callback(
             "/(\{pageaddvar name=)(['|\"]?)([\w]+)(['|\"]?)\s(value=)(['|\"]?)([\S][^'|\"]+)(['|\"]?)(\})/",
-            function($matches) {
+            function ($matches) {
                 return "{{ pageAddVar('$matches[3], '') }}{# @todo oldpath= $matches[7] #}";
             },
             $content);
-	}
+    }
 
-	private function replaceGettext($content)
-	{
+    private function replaceGettext($content)
+    {
         // only replaces gt and does not accommodate string replacements or plurals or counts (__f(), __
         return preg_replace_callback(
             "/(\{gt text=)(['|\"]?)([\w][^'|\"]+)(['|\"]?)(['|\"]?)(\})/",
-            function($matches) {
+            function ($matches) {
                 return "{{ __('$matches[3]') }}";
             },
             $content);
-	}
+    }
 
     private function replaceMisc($content)
     {
@@ -103,9 +88,24 @@ class ZikulaConverter extends ConverterAbstract
             "{{ maincontent }}" => "{{ maincontent|raw }}",
         ];
         foreach ($replacements as $k => $v) {
-            $content = preg_replace('/'.$k.'/', $v, $content);
+            $content = preg_replace('/' . $k . '/', $v, $content);
         }
 
         return $content;
+    }
+
+    public function getPriority()
+    {
+        return 0; // lower priority means do later
+    }
+
+    public function getName()
+    {
+        return 'zikula';
+    }
+
+    public function getDescription()
+    {
+        return 'Convert zikula-specific smarty tags to compatible twig tags.';
     }
 }
