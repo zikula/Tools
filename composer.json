@@ -1,8 +1,9 @@
 {
     "name": "zikula/tools",
     "homepage": "http://zikula.org/",
+    "type": "application",
     "license": "MIT",
-    "description": "Zikula Tools",
+    "description": "Tools to assist conversion of zikula extensions from Core-1.3 spec to Core-2.0 spec.",
     "minimum-stability": "dev",
     "autoload": {
         "psr-0": {
@@ -11,8 +12,8 @@
     },
     "authors": [
         {
-            "name": "Drak",
-            "email": "drak@zikula.org"
+            "name": "Zikula Team",
+            "homepage": "http://www.zikula.org"
         }
     ],
     "require": {
@@ -22,6 +23,8 @@
         "symfony/finder": "2.2.*",
         "symfony/filesystem": "2.2.*",
         "nikic/php-parser": "dev-master",
+        "phpunit/phpunit": "3.7.*",
+        "sebastian/diff": "1.0.*@dev",
 	    "tcopestake/php-parser-psr-2-pretty-printer": "dev-master",
         "fabpot/php-cs-fixer": "0.4.*"
     },
