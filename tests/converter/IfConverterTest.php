@@ -9,11 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace sankar\ST\Tests\Converter;
+namespace Zikula\Tools\Tests\Converter;
 
-use sankar\ST\Converter;
-use sankar\ST\Converter\IfConverter;
-use sankar\ST\ConverterAbstract;
+use Zikula\Tools\Converter;
+use Zikula\Tools\Converter\IfConverter;
+use Zikula\Tools\ConverterAbstract;
 
 /**
  * @author sankara <sankar.suda@gmail.com>
@@ -28,7 +28,7 @@ class IfConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers       sankar\ST\Converter\IfConverter::convert
+     * @covers       Zikula\Tools\Converter\IfConverter::convert
      * @dataProvider Provider
      */
     public function testThatIfIsConverted($smarty, $twig)
@@ -78,7 +78,7 @@ class IfConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers sankar\ST\Converter\IfConverter::getName
+     * @covers Zikula\Tools\Converter\IfConverter::getName
      */
     public function testThatHaveExpectedName()
     {
@@ -86,7 +86,7 @@ class IfConverterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers sankar\ST\Converter\IfConverter::getDescription
+     * @covers Zikula\Tools\Converter\IfConverter::getDescription
      */
     public function testThatHaveDescription()
     {
