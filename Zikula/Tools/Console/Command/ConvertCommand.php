@@ -49,7 +49,7 @@ class ConvertCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('convert')
+            ->setName('toTwig:convert')
             ->setDefinition(array(
                 new InputArgument('path', InputArgument::REQUIRED, 'The path'),
                 new InputOption('config', '', InputOption::VALUE_REQUIRED, 'The configuration name', null),
@@ -59,7 +59,7 @@ class ConvertCommand extends Command
                 new InputOption('dry-run', '', InputOption::VALUE_NONE, 'Only shows which files would have been modified'),
                 new InputOption('format', '', InputOption::VALUE_REQUIRED, 'To output results in other formats', 'txt')
             ))
-            ->setDescription('Convert a directory or a file')
+            ->setDescription('Convert a directory or a file from Smarty to Twig')
             ->setHelp(<<<EOF
 The <info>%command.name%</info> command tries to fix as much coding standards
 problems as possible on a given file or directory:
@@ -103,17 +103,17 @@ fixed but without actually modifying them:
 Instead of using command line options to customize the converter, you can save the
 configuration in a <comment>.php_st</comment> file in the root directory of
 your project. The file must return an instance of
-`toTwig\ConfigInterface`, which lets you configure the converters, the files,
+`Zikula\Tools\ConfigInterface`, which lets you configure the converters, the files,
 and directories that need to be analyzed:
 
 	<?php
 
-	\$finder = toTwig\Finder\DefaultFinder::create()
+	\$finder = Zikula\Tools\Finder\DefaultFinder::create()
 		->exclude('somefile')
 		->in(__DIR__)
 	;
 
-	return toTwig\Config\Config::create()
+	return Zikula\Tools\Config\Config::create()
 		->converters(array('if', 'for'))
 		->finder(\$finder)
 	;

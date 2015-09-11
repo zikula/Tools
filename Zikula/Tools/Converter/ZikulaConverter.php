@@ -15,7 +15,7 @@ use Zikula\Tools\ConverterAbstract;
 
 /**
  * Class ZikulaConverter
- * @package toTwig\Converter
+ * @package Zikula\Tools\Converter
  */
 class ZikulaConverter extends ConverterAbstract
 {

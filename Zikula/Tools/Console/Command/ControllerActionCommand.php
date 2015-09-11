@@ -2,6 +2,7 @@
 
 namespace Zikula\Tools\Console\Command;
 
+use PhpParser\ParserFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -57,7 +58,7 @@ EOF
             try {
                 $code = file_get_contents($file->getRealPath());
 
-                $parser = new \PhpParser\Parser(new \PhpParser\Lexer());
+                $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP5);
                 $traverser = new \PhpParser\NodeTraverser();
                 $prettyPrinter = new \PhpParser\PrettyPrinter\Standard;
                 $traverser->addVisitor(new Visitor\ControllerActionVisitor());

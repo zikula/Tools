@@ -11,7 +11,7 @@
 
 namespace Zikula\Tools;
 
-use SebastianBergmann\Diff;
+use \SebastianBergmann\Diff\Differ as Diff;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 
@@ -34,7 +34,7 @@ class Converter
     public function registerBuiltInConverters()
     {
         foreach (Finder::create()->files()->in(__DIR__ . '/Converter') as $file) {
-            $class = 'toTwig\\Converter\\' . basename($file, '.php');
+            $class = 'Zikula\\Tools\\Converter\\' . basename($file, '.php');
             $this->addConverter(new $class());
         }
     }
@@ -61,7 +61,7 @@ class Converter
     public function registerBuiltInConfigs()
     {
         foreach (Finder::create()->files()->in(__DIR__ . '/Config') as $file) {
-            $class = 'toTwig\\Config\\' . basename($file, '.php');
+            $class = 'Zikula\\Tools\\Config\\' . basename($file, '.php');
             $this->addConfig(new $class());
         }
     }

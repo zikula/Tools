@@ -3,6 +3,7 @@
 namespace Zikula\Tools\Console;
 
 use Symfony\Component\Console\Application as BaseApplication;
+use Zikula\Tools\Console\Command\ConvertCommand;
 use Zikula\Tools\Version;
 
 class Application extends BaseApplication
@@ -17,11 +18,12 @@ class Application extends BaseApplication
         $this->add(new Command\NamespaceCommand());
         $this->add(new Command\RestructureModuleCommand());
         $this->add(new Command\RestructureThemeCommand());
+        $this->add(new ConvertCommand());
         $this->add(new Command\CompileCommand());
     }
 
     public function getLongVersion()
     {
-        return parent::getLongVersion() . ' by <comment>Drak</comment>';
+        return parent::getLongVersion() . ' by <comment>Zikula Team</comment>';
     }
 }

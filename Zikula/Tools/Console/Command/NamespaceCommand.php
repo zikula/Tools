@@ -2,6 +2,7 @@
 
 namespace Zikula\Tools\Console\Command;
 
+use PhpParser\ParserFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -67,7 +68,7 @@ EOF
             /** @var \SplFileInfo $file */
             $output->writeln("<info>Processing {$file->getRealPath()}</info>");
             try {
-                $parser = new \PhpParser\Parser(new \PhpParser\Lexer());
+                $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP5);
                 $importTraverser = new \PhpParser\NodeTraverser();
                 $traverser = new \PhpParser\NodeTraverser();
                 $prettyPrinter = new \PhpParser\PrettyPrinter\Standard;
