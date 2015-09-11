@@ -17,16 +17,16 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/config": "2.2.*",
-        "symfony/console": "2.2.*",
-        "symfony/finder": "2.2.*",
-        "symfony/filesystem": "2.2.*",
+        "php": ">=5.3.6",
+        "symfony/config": "2.7.*",
+        "symfony/console": "2.7.*",
+        "symfony/finder": "2.7.*",
+        "symfony/filesystem": "2.7.*",
         "nikic/php-parser": "dev-master",
-        "phpunit/phpunit": "3.7.*",
-        "sebastian/diff": "1.0.*@dev",
+        "phpunit/phpunit": "4.8.*",
+        "sebastian/diff": "1.3.*",
 	    "tcopestake/php-parser-psr-2-pretty-printer": "dev-master",
-        "fabpot/php-cs-fixer": "0.4.*"
+        "fabpot/php-cs-fixer": "1.10.*"
     },
     "bin": ["zikula-tools"]
 }
