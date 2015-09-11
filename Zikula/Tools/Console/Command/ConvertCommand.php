@@ -237,6 +237,27 @@ EOF
                 throw new \InvalidArgumentException(sprintf('The format "%s" is not defined.', $input->getOption('format')));
         }
 
+        // change suffix of files
+        $i = 1;
+        $output->writeln('');
+        $output->writeln('<info>Renaming files:</info>');
+        foreach ($changed as $file => $fixResult) {
+            if (file_exists($path . DIRECTORY_SEPARATOR . $file)) {
+                $splFile = new \SplFileInfo(realpath($path . DIRECTORY_SEPARATOR . $file));
+                if ($splFile->getExtension() == "tpl") {
+                    $oldFileName = $splFile->getRealPath();
+                    $newFileName = $splFile->getPath() . DIRECTORY_SEPARATOR . $splFile->getBasename('.tpl') . ".html.twig";
+                    `mv {$oldFileName} {$newFileName}`;
+                    if ($input->getOption('verbose')) {
+                        $output->writeln('  ' . $i++ . ') ' . basename($oldFileName) . ' renamed to <comment>' . basename($newFileName) . '</comment>');
+                    }
+                }
+            }
+        }
+        if (!empty($changed)) {
+            $output->writeln('<error>Files have been renamed, but must be added and commited in git.</error>');
+        }
+
         return empty($changed) ? 0 : 1;
     }
 

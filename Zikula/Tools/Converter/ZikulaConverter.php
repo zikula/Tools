@@ -96,7 +96,7 @@ class ZikulaConverter extends ConverterAbstract
 
     public function getPriority()
     {
-        return 0; // lower priority means do later
+        return 1; // lower priority means do later
     }
 
     public function getName()
