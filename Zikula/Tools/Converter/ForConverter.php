@@ -66,8 +66,10 @@ class ForConverter extends ConverterAbstract
 
                 $attr = $this->attributes($match);
 
-                if ($attr['key']) {
-                    $replace['key'] = $attr['key'] . ',';
+                if (!empty($attr['key'])) {
+                    $replace['key'] = $this->variable($attr['key']) . ',';
+                } else {
+                    $replace['key'] = '';
                 }
 
                 $replace['item'] = $this->variable($attr['item']);

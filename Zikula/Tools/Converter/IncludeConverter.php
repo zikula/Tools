@@ -36,6 +36,8 @@ class IncludeConverter extends ConverterAbstract
 
             $replace = array();
             $replace['template'] = $attr['file'];
+            $replace['with'] = '';
+            $replace['vars'] = '';
 
             // If we have any other variables
             if (count($attr) > 1) {
