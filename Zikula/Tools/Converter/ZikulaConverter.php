@@ -79,12 +79,8 @@ class ZikulaConverter extends ConverterAbstract
         return preg_replace_callback(
             "/\{checkpermission[\s]+component=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+instance=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+level=['|\"]?([a-z0-9:_]+)['|\"]?[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?(\})/i",
             function ($matches) {
-                $funcString = "{{ hasPermission('$matches[1]', '$matches[2]', '$matches[3]') }}";
-                if (!empty($matches[4])) {
-                    return "{% set $matches[4] %}$funcString{% endset %}{# @todo inefficient - use `if hasPermission()` #}";
-                } else {
-                    return $funcString;
-                }
+                $set = (!empty($matches[4])) ? "set $matches[4] = " : '';
+                return "{{ {$set}hasPermission('$matches[1]', '$matches[2]', '$matches[3]') }}{# @todo consider `if hasPermission()` #}";
             },
             $content);
     }
