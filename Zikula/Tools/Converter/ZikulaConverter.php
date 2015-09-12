@@ -25,6 +25,8 @@ class ZikulaConverter extends ConverterAbstract
         $content = $this->replaceModurl($content);
         $content = $this->replacePageaddvar($content);
         $content = $this->replaceGettext($content);
+        $content = $this->replaceCheckPermission($content);
+        $content = $this->replaceCheckPermissionBlock($content);
         $content = $this->replaceMisc($content);
 
         return $content;
@@ -33,9 +35,9 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceBlockPosition($content)
     {
         return preg_replace_callback(
-            "/(\{blockposition name=)([\w]+)(\})/",
+            "/\{blockposition name=([\w]+)\}/i",
             function ($matches) {
-                return "{{ showblockposition('$matches[2]') }}";
+                return "{{ showblockposition('$matches[1]') }}";
             },
             $content);
     }
@@ -43,9 +45,10 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceModurl($content)
     {
         return preg_replace_callback(
-            "/(\{modurl)([\s]+)(modname=['|\"]?)([\w][^'|\"]+)(['|\"]?)([\s]+)(type=['|\"]?)([\w][^'|\"]+)(['|\"]?)([\s]+)(func=['|\"]?)([\w][^'|\"]+)(['|\"]?)(\})/",
+            "/\{modurl[\s]+modname=['|\"]?([\w][^'|\"]+)['|\"]?[\s]+type=['|\"]?([\w][^'|\"]+)['|\"]?[\s]+func=['|\"]?([\w][^'|\"]+)['|\"]?\}/i",
             function ($matches) {
-                return "{{ path('" . strtolower($matches[4]) . "_$matches[8]_$matches[12]') }}";
+                $note = (false === stripos($matches[1], 'module')) ? '{# @todo probably an incorrect path #}' : '';
+                return "{{ path('" . strtolower($matches[1]) . "_$matches[2]_$matches[3]') }}$note";
             },
             $content);
     }
@@ -53,9 +56,9 @@ class ZikulaConverter extends ConverterAbstract
     private function replacePageaddvar($content)
     {
         return preg_replace_callback(
-            "/(\{pageaddvar name=)(['|\"]?)([\w]+)(['|\"]?)\s(value=)(['|\"]?)([\S][^'|\"]+)(['|\"]?)(\})/",
+            "/\{pageaddvar name=['|\"]?([\w]+)['|\"]?\svalue=['|\"]?([a-z0-9:_][^'|\"]+)['|\"]?\}/i",
             function ($matches) {
-                return "{{ pageAddVar('$matches[3], '') }}{# @todo oldpath= $matches[7] #}";
+                return "{{ pageAddVar('$matches[1], '') }}{# @todo oldpath= $matches[2] #}";
             },
             $content);
     }
@@ -64,9 +67,34 @@ class ZikulaConverter extends ConverterAbstract
     {
         // only replaces gt and does not accommodate string replacements or plurals or counts (__f(), __
         return preg_replace_callback(
-            "/(\{gt text=)(['|\"]?)([\w][^'|\"]+)(['|\"]?)(['|\"]?)(\})/",
+            "/\{gt text=['|\"]?([\w][^'|\"]+)['|\"]?['|\"]?\}/i",
             function ($matches) {
-                return "{{ __('$matches[3]') }}";
+                return "{{ __('$matches[1]') }}";
+            },
+            $content);
+    }
+
+    private function replaceCheckPermission($content)
+    {
+        return preg_replace_callback(
+            "/\{checkpermission[\s]+component=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+instance=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+level=['|\"]?([a-z0-9:_]+)['|\"]?[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?(\})/i",
+            function ($matches) {
+                $funcString = "{{ hasPermission('$matches[1]', '$matches[2]', '$matches[3]') }}";
+                if (!empty($matches[4])) {
+                    return "{% set $matches[4] %}$funcString{% endset %}{# @todo inefficient - use `if hasPermission()` #}";
+                } else {
+                    return $funcString;
+                }
+            },
+            $content);
+    }
+
+    private function replaceCheckPermissionBlock($content)
+    {
+        return preg_replace_callback(
+            "/\{checkpermissionblock[\s]+component=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+instance=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+level=(['|\"]?)([a-z0-9:_]+)['|\"]?\}/i",
+            function ($matches) {
+                return "{% if hasPermission('$matches[1]', '$matches[2]', '$matches[3]') %}";
             },
             $content);
     }
@@ -86,9 +114,10 @@ class ZikulaConverter extends ConverterAbstract
             "{adminpanelmenu}" => "{# adminpanelmenu #}",
             "{{ content }}" => "{{ content|raw }}",
             "{{ maincontent }}" => "{{ maincontent|raw }}",
+            "{\/checkpermissionblock}" => "{% endif %}",
         ];
         foreach ($replacements as $k => $v) {
-            $content = preg_replace('/' . $k . '/', $v, $content);
+            $content = preg_replace('/' . $k . '/i', $v, $content);
         }
 
         return $content;
