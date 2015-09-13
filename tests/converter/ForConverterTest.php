@@ -33,24 +33,21 @@ class ForConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatForIsConverted($smarty, $twig)
     {
-
-        // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-
     }
 
     public function Provider()
     {
         return array(
             array(
-                '{foreach $myColors as $color}\nfoo{/foreach}',
+                '{foreach $myColors as $color}\nfoo\n{/foreach}',
                 '{% for color in myColors %}\nfoo\n{% endfor %}'
             ),
             array(
                 '{foreach $contact as $key => $value}\nfoo{/foreach}',
-                '{% for key,value in contact %}\nfoo{% endfor %}'
+                '{% for key, value in contact %}\nfoo{% endfor %}'
             ),
             array(
                 '{foreach name=outer item=contact from=$contacts}\nfoo{/foreach}',
@@ -58,7 +55,7 @@ class ForConverterTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 '{foreach key=key item=item from=$contact}\nfoo\n{foreachelse}bar{/foreach}',
-                '{% for key,item in contact %}\nfoo\n{% else %}bar{% endfor %}'
+                '{% for key, item in contact %}\nfoo\n{% else %}bar{% endfor %}'
             ),
         );
     }
@@ -82,7 +79,8 @@ class ForConverterTest extends \PHPUnit_Framework_TestCase
     private function getFileMock()
     {
         return $this->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('mockFile'))
             ->getMock();
     }
 }

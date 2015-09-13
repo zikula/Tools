@@ -26,8 +26,6 @@ class IfConverter extends ConverterAbstract
         'ne' => '!=',
         'not' => '!',
         'mod' => '%',
-        'or' => '||',
-        'and' => '&&'
     );
 
     public function convert(\SplFileInfo $file, $content)
@@ -36,9 +34,9 @@ class IfConverter extends ConverterAbstract
         $content = $this->replaceIf($content);
         // Replace {elseif }
         $content = $this->replaceElseIf($content);
-        // Replace {else}
-        $content = preg_replace('#\{/if\s*\}#', "{% endif %}", $content);
         // Replace {/if}
+        $content = preg_replace('#\{/if\s*\}#', "{% endif %}", $content);
+        // Replace {else}
         $content = preg_replace('#\{else\s*\}#', "{% else %}", $content);
 
         return $content;
@@ -63,6 +61,16 @@ class IfConverter extends ConverterAbstract
             foreach ($this->alt as $key => $value) {
                 $match = str_replace(" $key ", " $value ", $match);
             }
+
+            // take care of `!foo`
+            $match = preg_replace_callback("/(!)([^=\s]+)/i", function ($m) {
+                return "not $m[2]";
+            }, $match);
+
+            // take care of bar:foo['hello']
+            $match = preg_replace_callback("/(:)([^}\s]+)/i", function ($m) {
+                return "($m[2])";
+            }, $match);
 
             // Replace $vars
             $match = $this->replaceVariable($match);

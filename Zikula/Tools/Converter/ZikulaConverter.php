@@ -25,11 +25,14 @@ class ZikulaConverter extends ConverterAbstract
     {
         $content = $this->replaceBlockPosition($content);
         $content = $this->replaceModurl($content);
+        $content = $this->replaceRoute($content);
         $content = $this->replacePageaddvar($content);
         $content = $this->replaceGettext($content);
         $content = $this->replaceCheckPermission($content);
         $content = $this->replaceCheckPermissionBlock($content);
         $content = $this->replaceEmptyTest($content);
+        $content = $this->replaceAjaxHeader($content);
+        $content = $this->replaceModvarLookup($content);
         $content = $this->replaceMisc($content);
 
         return $content;
@@ -54,17 +57,39 @@ class ZikulaConverter extends ConverterAbstract
     }
 
     /**
-     * replace {modurl modname='ZikulaSettingsModule' type='admin' func='index'}
+     * replace {modurl modname='ZikulaSettingsModule' type='admin' func='index' aparam='value'}
      * @param $content
      * @return mixed
      */
     private function replaceModurl($content)
     {
         return preg_replace_callback(
-            "/\{modurl[\s]+modname=['|\"]?([\w][^'|\"]+)['|\"]?[\s]+type=['|\"]?([\w][^'|\"]+)['|\"]?[\s]+func=['|\"]?([\w][^'|\"]+)['|\"]?\}/i",
+            "/\{modurl[\s]*([\s\S]*)?\}/i",
             function ($matches) {
-                $note = (false === stripos($matches[1], 'module')) ? '{# @todo probably an incorrect path #}' : '';
-                return "{{ path('" . strtolower($matches[1]) . "_$matches[2]_$matches[3]') }}$note";
+                $params = $this->createParamArray($matches[1]);
+                $mod = $params['modname'];
+                $type = $params['type'];
+                $func = $params['func'];
+                unset($params['modname'], $params['type'], $params['func']);
+                $note = (false === stripos($mod, 'module')) ? '{# @todo probably an incorrect path #}' : '';
+                return "{{ path('" . strtolower($mod) . "_{$type}_{$func}', " . json_encode($params) . ") }}$note";
+            },
+            $content);
+    }
+
+    /**
+     * replace {route name='zikulagroupsmodule_admin_delete' gid=$item.gid}
+     * WARNING! does not accommodate twig variables (will enclose them in quotes)
+     * @param $content
+     * @return mixed
+     */
+    private function replaceRoute($content)
+    {
+        return preg_replace_callback(
+            "/\{route name=['|\"]?([\w]+)['|\"]?[\s]*([\s\S]*)?\}/i",
+            function ($matches) {
+                $params = $this->createParamArray($matches[2]);
+                return "{{ path('$matches[1]', " . json_encode($params) . ") }}";
             },
             $content);
     }
@@ -85,22 +110,35 @@ class ZikulaConverter extends ConverterAbstract
     }
 
     /**
-     * replace {gt text='Membership application' assign='templatetitle'}
      * `assign` is optional parameter
      * @param $content
      * @return mixed
      */
     private function replaceGettext($content)
     {
-        // only replaces gt and does not accommodate string replacements or plurals or counts (__f(), __
-        return preg_replace_callback(
-            "/\{gt text=['|\"]?([\w][^'|\"]+)['|\"]?['|\"]?[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?\}/i",
+        // replace {gt text='Membership application' assign='templatetitle'}
+        $newContent[0] = preg_replace_callback(
+            "/\{gt text=['|\"]?([\w\W][^'|\"]+)['|\"]?[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?\}/i",
             function ($matches) {
                 $set = (!empty($matches[3])) ? "set $matches[3] = " : '';
                 $delims = $this->delims[(int)!empty($matches[3])];
                 return "$delims[0] {$set}__('$matches[1]') $delims[1]";
             },
             $content);
+
+        // replace {gt text='Delete: %s' tag1=$group.name assign='strDeleteGroup'}
+        $newContent[1] = preg_replace_callback(
+            "/\{gt text=['|\"]?([\w\W][^'|\"]+)['|\"]?[\s]*tag1=([\S]+)[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?\}/i",
+            function ($matches) {
+                $set = (!empty($matches[4])) ? "set $matches[4] = " : '';
+                $delims = $this->delims[(int)!empty($matches[4])];
+                $matches[1] = str_replace('%s', '%sub%', $matches[1]);
+                $sub = $this->variable($matches[3]);
+                return "$delims[0] {$set}__f('$matches[1]', {'%sub%' => $sub}) $delims[1]";
+            },
+            $newContent[0]);
+
+        return end($newContent);
     }
 
     /**
@@ -153,6 +191,36 @@ class ZikulaConverter extends ConverterAbstract
     }
 
     /**
+     * replace {ajaxheader modname='Groups' filename='groups.js' ui=true}
+     * @param $content
+     * @return mixed
+     */
+    private function replaceAjaxHeader($content)
+    {
+        return preg_replace_callback(
+            "/\{(ajaxheader[\s]*[\s\S]*?)\}/i",
+            function ($matches) {
+                return "{# $matches[1] #}";
+            },
+            $content);
+    }
+
+    /**
+     * replace modvars.ZikulaGroupsModule.hideclosed
+     * @param $content
+     * @return mixed
+     */
+    private function replaceModvarLookup($content)
+    {
+        return preg_replace_callback(
+            "/modvars\.([\w]+)\.([\w]+)/", // case sensitive match
+            function ($matches) {
+                return "{{ getModVar('$matches[1]', '$matches[2]') }}";
+            },
+            $content);
+    }
+
+    /**
      * replace miscellaneous texts/tags
      * @param $content
      * @return mixed
@@ -167,8 +235,6 @@ class ZikulaConverter extends ConverterAbstract
             "{langdirection}" => "{{ pagevars.langdirection }}",
             "{charset}" => "{{ pagevars.meta.charset }}",
             "{homepage}" => "{{ app.request.baseUrl }}",
-            "{{ modvars.ZConfig.sitename }}" => "{{ getModVar('ZConfig', 'sitename') }}",
-            "{{ modvars.ZConfig.slogan }}" => "{{ getModVar('ZConfig', 'slogan') }}",
             "{adminpanelmenu}" => "{# adminpanelmenu #}",
             "{{ content }}" => "{{ content|raw }}",
             "{{ maincontent }}" => "{{ maincontent|raw }}",
@@ -177,6 +243,8 @@ class ZikulaConverter extends ConverterAbstract
             "{\/nocache}" => "",
             "{pagerendertime}" => "",
             ".tpl" => ".html.twig",
+            "{adminheader}" => "{{ render(controller('ZikulaAdminModule:Admin:adminheader')) }}",
+            "{adminfooter}" => "{{ render(controller('ZikulaAdminModule:Admin:adminfooter')) }}",
         ];
         foreach ($replacements as $k => $v) {
             $content = preg_replace('/' . $k . '/i', $v, $content);
@@ -198,5 +266,22 @@ class ZikulaConverter extends ConverterAbstract
     public function getDescription()
     {
         return 'Convert zikula-specific smarty tags to compatible twig tags.';
+    }
+
+    /**
+     * Create array of parameters from string provided by Smarty template function
+     * @param $string
+     * @return array
+     */
+    private function createParamArray($string)
+    {
+        $rawParams = explode(' ', $string);
+        $params = [];
+        foreach($rawParams as $param) {
+            list($k, $v) = explode('=', $param);
+            $params[trim($k)] = trim(str_replace(['\'','"'], '', $v));
+        }
+
+        return $params;
     }
 }

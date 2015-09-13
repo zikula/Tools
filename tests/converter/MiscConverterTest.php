@@ -18,7 +18,7 @@ use Zikula\Tools\ConverterAbstract;
 /**
  * @author sankara <sankar.suda@gmail.com>
  */
-class CommentconverterTest extends \PHPUnit_Framework_TestCase
+class MiscConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected $converter;
 
@@ -76,7 +76,8 @@ class CommentconverterTest extends \PHPUnit_Framework_TestCase
     private function getFileMock()
     {
         return $this->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('mockFile'))
             ->getMock();
     }
 }

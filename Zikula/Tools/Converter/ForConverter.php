@@ -49,7 +49,7 @@ class ForConverter extends ConverterAbstract
 
             $match = $matches[1];
             $search = $matches[0];
-            $replace = array();
+            $replace = array('key' => '');
 
             // {foreach $users as $user}
             if (preg_match("/(.*)(?:as)(.*)/i", $match, $mcs)) {

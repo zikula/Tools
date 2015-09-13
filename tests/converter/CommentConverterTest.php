@@ -18,7 +18,7 @@ use Zikula\Tools\ConverterAbstract;
 /**
  * @author sankara <sankar.suda@gmail.com>
  */
-class CommentconverterTest extends \PHPUnit_Framework_TestCase
+class CommentConverterTest extends \PHPUnit_Framework_TestCase
 {
     protected $converter;
 
@@ -33,12 +33,9 @@ class CommentconverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatIfIsConverted($smarty, $twig)
     {
-
-        // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-
     }
 
     public function Provider()
@@ -70,7 +67,8 @@ class CommentconverterTest extends \PHPUnit_Framework_TestCase
     private function getFileMock()
     {
         return $this->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('mockFile'))
             ->getMock();
     }
 }

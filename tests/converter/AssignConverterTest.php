@@ -11,9 +11,7 @@
 
 namespace Zikula\Tools\Tests\Converter;
 
-use Zikula\Tools\Converter;
 use Zikula\Tools\Converter\AssignConverter;
-use Zikula\Tools\ConverterAbstract;
 
 /**
  * @author sankara <sankar.suda@gmail.com>
@@ -33,12 +31,9 @@ class AssignConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatAssignIsConverted($smarty, $twig)
     {
-
-        // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-
     }
 
     public function Provider()
@@ -82,7 +77,8 @@ class AssignConverterTest extends \PHPUnit_Framework_TestCase
     private function getFileMock()
     {
         return $this->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('mockFile'))
             ->getMock();
     }
 }

@@ -33,26 +33,23 @@ class IncludeConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatIncludeIsConverted($smarty, $twig)
     {
-
-        // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-
     }
 
     public function Provider()
     {
         return array(
             array(
-                "{include file='page_header.tpl'}"
-                        "{% include 'page_header.tpl' %}"
-                    ),
-                array(
-                    '{include file=\'footer.tpl\' foo=\'bar\' links=$links}',
-                    '{% include \'footer.tpl\' with {\'foo\' : \'bar\', links : links} %}'
-                )
-            );
+                "{include file='page_header.tpl'}",
+                "{% include 'page_header.tpl' %}"
+            ),
+            array(
+                '{include file=\'footer.tpl\' foo=\'bar\' links=$links}',
+                '{% include \'footer.tpl\' with {\'foo\' : \'bar\', \'links\' : links} %}'
+            )
+        );
     }
 
     /**
@@ -74,7 +71,8 @@ class IncludeConverterTest extends \PHPUnit_Framework_TestCase
     private function getFileMock()
     {
         return $this->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('mockFile'))
             ->getMock();
     }
 }

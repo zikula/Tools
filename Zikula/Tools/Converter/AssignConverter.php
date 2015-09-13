@@ -36,8 +36,8 @@ class AssignConverter extends ConverterAbstract
             $match = $matches[1];
             $attr = $this->attributes($match);
 
-            $key = $attr['var'];
-            $value = $attr['value'];
+            $key = isset($attr['var']) ? $attr['var'] : null;
+            $value = isset($attr['value']) ? $attr['value'] : null;
 
             // Short-hand {assign "name" "Bob"}
             if (!isset($key)) {

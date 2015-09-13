@@ -33,12 +33,9 @@ class IfConverterTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatIfIsConverted($smarty, $twig)
     {
-
-        // Test the above cases
         $this->assertSame($twig,
             $this->converter->convert($this->getFileMock(), $smarty)
         );
-
     }
 
     public function Provider()
@@ -46,33 +43,33 @@ class IfConverterTest extends \PHPUnit_Framework_TestCase
         return array(
             array(
                 // Test an if statement (no else or elseif)
-                '{if !foo or foo.bar or foo|bar:foo[\'hello\']}\nfoo\n{/if}',
-                '{% if not foo or foo.bar or foo|bar(foo[\'hello\']) %}\nfoo\n{% endif %}'
+                "{if !foo or foo.bar or foo|bar:foo['hello']}\nfoo\n{/if}",
+                "{% if not foo or foo.bar or foo|bar(foo['hello']) %}\nfoo\n{% endif %}"
             ),
             array(
                 // Test an if with an else and a single logical operation.
-                '{if foo}\nbar\n{else}\nfoo{/if}',
+                "{if foo}\nbar\n{else}\nfoo{/if}",
                 "{% if foo %}\nbar\n{% else %}\nfoo{% endif %}"
             ),
             array(
                 // Test an if with an else and an elseif and two logical operations
-                '{if foo and awesome.string|banana:"foo" $a"}\nbar\n{elseif awesome.sauce[1] and blue and \'hello\'}\nfoo{/if}',
-                '{% if foo and awesome.string|banana("foo" %s"|format(a)) %}\nbar\n{% elseif awesome.sauce[1] and blue and \'hello\' %}\nfoo{% endif %}'
+                "{if foo and awesome.string|banana:\"foo\"}\nbar\n{elseif awesome.sauce[1] and blue and 'hello'}\nfoo{/if}",
+                "{% if foo and awesome.string|banana(\"foo\") %}\nbar\n{% elseif awesome.sauce[1] and blue and 'hello' %}\nfoo{% endif %}"
             ),
             array(
                 // Test an if with an elseif and else clause.
-                '{if foo|bar:3 or !foo[3]}\nbar\n{elseif awesome.sauce[1] and blue and \'hello\'}\nfoo\n{else}bar{/if}',
-                '{% if foo|bar(3) or not foo[3] %}\nbar\n{% elseif awesome.sauce[1] and blue and \'hello\' %}\nfoo\n{% else %}bar{% endif %}'
+                "{if foo|bar:3 or !foo[3]}\nbar\n{elseif awesome.sauce[1] and blue and 'hello'}\nfoo\n{else}bar{/if}",
+                "{% if foo|bar(3) or not foo[3] %}\nbar\n{% elseif awesome.sauce[1] and blue and 'hello' %}\nfoo\n{% else %}bar{% endif %}"
             ),
             array(
                 // Test an if statement with parenthesis.
-                '{if (foo and bar) or foo and (bar or (foo and bar))}\nbar\n{else}\nfoo{/if}',
-                '{% if (foo and bar) or foo and (bar or (foo and bar)) %}\nbar\n{% else %}\nfoo{% endif %}'
+                "{if (foo and bar) or foo and (bar or (foo and bar))}\nbar\n{else}\nfoo{/if}",
+                "{% if (foo and bar) or foo and (bar or (foo and bar)) %}\nbar\n{% else %}\nfoo{% endif %}"
             ),
             array(
                 // Test an elseif statement with parenthesis.
-                '{if foo}\nbar\n{elseif (foo and bar) or foo and (bar or (foo and bar))}\nfoo{/if}',
-                '{% if foo %}\nbar\n{% elseif (foo and bar) or foo and (bar or (foo and bar)) %}\nfoo{% endif %}'
+                "{if foo}\nbar\n{elseif (foo and bar) or foo and (bar or (foo and bar))}\nfoo{/if}",
+                "{% if foo %}\nbar\n{% elseif (foo and bar) or foo and (bar or (foo and bar)) %}\nfoo{% endif %}"
             )
         );
     }
@@ -96,7 +93,8 @@ class IfConverterTest extends \PHPUnit_Framework_TestCase
     private function getFileMock()
     {
         return $this->getMockBuilder('\SplFileInfo')
-            ->disableOriginalConstructor()
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array('mockFile'))
             ->getMock();
     }
 }
