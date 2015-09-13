@@ -57,7 +57,7 @@ class ZikulaConverter extends ConverterAbstract
     }
 
     /**
-     * replace {modurl modname='ZikulaSettingsModule' type='admin' func='index' aparam='value'}
+     * replace {modurl modname='ZikulaSettingsModule' type='admin' func='index' aparam='value' assign='foo'}
      * @param $content
      * @return mixed
      */
@@ -70,9 +70,12 @@ class ZikulaConverter extends ConverterAbstract
                 $mod = $params['modname'];
                 $type = $params['type'];
                 $func = $params['func'];
-                unset($params['modname'], $params['type'], $params['func']);
+                $set = !empty($params['assign']) ? "set $params[assign] = " : '';
+                unset($params['modname'], $params['type'], $params['func'], $params['assign']);
+                $paramString = !empty($params) ? ', ' . json_encode($params) : '';
                 $note = (false === stripos($mod, 'module')) ? '{# @todo probably an incorrect path #}' : '';
-                return "{{ path('" . strtolower($mod) . "_{$type}_{$func}', " . json_encode($params) . ") }}$note";
+                $delims = $this->delims[(int)!empty($set)];
+                return "$delims[0] {$set}path('" . strtolower($mod) . "_{$type}_{$func}'{$paramString}) {$delims[1]}$note";
             },
             $content);
     }
@@ -88,8 +91,12 @@ class ZikulaConverter extends ConverterAbstract
         return preg_replace_callback(
             "/\{route name=['|\"]?([\w]+)['|\"]?[\s]*([\s\S]*)?\}/i",
             function ($matches) {
-                $params = $this->createParamArray($matches[2]);
-                return "{{ path('$matches[1]', " . json_encode($params) . ") }}";
+                $params = !empty($matches[2]) ? $this->createParamArray($matches[2]) : null;
+                $set = !empty($params['assign']) ? "set $params[assign] = " : '';
+                $delims = $this->delims[(int)!empty($set)];
+                unset($params['assign']);
+                $paramString = !empty($params) ? ', ' . json_encode($params) : '';
+                return "$delims[0] {$set}path('$matches[1]'{$paramString}) $delims[1]";
             },
             $content);
     }
@@ -133,8 +140,8 @@ class ZikulaConverter extends ConverterAbstract
                 $set = (!empty($matches[4])) ? "set $matches[4] = " : '';
                 $delims = $this->delims[(int)!empty($matches[4])];
                 $matches[1] = str_replace('%s', '%sub%', $matches[1]);
-                $sub = $this->variable($matches[3]);
-                return "$delims[0] {$set}__f('$matches[1]', {'%sub%' => $sub}) $delims[1]";
+                $sub = $this->variable($matches[2]);
+                return "$delims[0] {$set}__f('$matches[1]', {\"%sub%\": $sub}) $delims[1]";
             },
             $newContent[0]);
 
@@ -167,7 +174,7 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceCheckPermissionBlock($content)
     {
         return preg_replace_callback(
-            "/\{checkpermissionblock[\s]+component=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+instance=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+level=(['|\"]?)([a-z0-9:_]+)['|\"]?\}/i",
+            "/\{checkpermissionblock[\s]+component=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+instance=['|\"]?([a-z0-9:_]+)['|\"]?[\s]+level=['|\"]?([a-z0-9:_]+)['|\"]?\}/i",
             function ($matches) {
                 return "{% if hasPermission('$matches[1]', '$matches[2]', '$matches[3]') %}";
             },
@@ -279,7 +286,8 @@ class ZikulaConverter extends ConverterAbstract
         $params = [];
         foreach($rawParams as $param) {
             list($k, $v) = explode('=', $param);
-            $params[trim($k)] = trim(str_replace(['\'','"'], '', $v));
+//            $params[trim($k)] = trim(str_replace(['\'','"'], '', $v));
+            $params[trim($k)] = $this->variable($v);
         }
 
         return $params;
