@@ -29,11 +29,18 @@ class ZikulaConverter extends ConverterAbstract
         $content = $this->replaceGettext($content);
         $content = $this->replaceCheckPermission($content);
         $content = $this->replaceCheckPermissionBlock($content);
+        $content = $this->replaceEmptyTest($content);
         $content = $this->replaceMisc($content);
 
         return $content;
     }
 
+    /**
+     * replace {blockposition name='topnav' assign='topnavblock'}
+     * `assign` is optional parameter
+     * @param $content
+     * @return mixed
+     */
     private function replaceBlockPosition($content)
     {
         return preg_replace_callback(
@@ -46,6 +53,11 @@ class ZikulaConverter extends ConverterAbstract
             $content);
     }
 
+    /**
+     * replace {modurl modname='ZikulaSettingsModule' type='admin' func='index'}
+     * @param $content
+     * @return mixed
+     */
     private function replaceModurl($content)
     {
         return preg_replace_callback(
@@ -57,6 +69,11 @@ class ZikulaConverter extends ConverterAbstract
             $content);
     }
 
+    /**
+     * replace {pageaddvar name="stylesheet" value="$stylepath/style.css"}
+     * @param $content
+     * @return mixed
+     */
     private function replacePageaddvar($content)
     {
         return preg_replace_callback(
@@ -67,6 +84,12 @@ class ZikulaConverter extends ConverterAbstract
             $content);
     }
 
+    /**
+     * replace {gt text='Membership application' assign='templatetitle'}
+     * `assign` is optional parameter
+     * @param $content
+     * @return mixed
+     */
     private function replaceGettext($content)
     {
         // only replaces gt and does not accommodate string replacements or plurals or counts (__f(), __
@@ -80,6 +103,12 @@ class ZikulaConverter extends ConverterAbstract
             $content);
     }
 
+    /**
+     * replace {checkpermission component='Categories::category' instance="ID::"|cat:$category.category.id level='ACCESS_EDIT' assign='authcatedit'}
+     * `assign` is optional parameter
+     * @param $content
+     * @return mixed
+     */
     private function replaceCheckPermission($content)
     {
         return preg_replace_callback(
@@ -92,6 +121,11 @@ class ZikulaConverter extends ConverterAbstract
             $content);
     }
 
+    /**
+     * replace {checkpermissionblock component='News::' instance=$item.cr_uid|cat:'::'|cat:$item.sid level='ACCESS_DELETE'}
+     * @param $content
+     * @return mixed
+     */
     private function replaceCheckPermissionBlock($content)
     {
         return preg_replace_callback(
@@ -102,6 +136,27 @@ class ZikulaConverter extends ConverterAbstract
             $content);
     }
 
+    /**
+     * replace !empty(title)
+     * @param $content
+     * @return mixed
+     */
+    private function replaceEmptyTest($content)
+    {
+        return preg_replace_callback(
+            "/(!)?empty\(([\w_$-]+)\)/i",
+            function ($matches) {
+                $not = !empty($matches[1]) ? 'not ' : '';
+                return "$matches[2] is {$not}empty";
+            },
+            $content);
+    }
+
+    /**
+     * replace miscellaneous texts/tags
+     * @param $content
+     * @return mixed
+     */
     private function replaceMisc($content)
     {
         $replacements = [
@@ -121,6 +176,7 @@ class ZikulaConverter extends ConverterAbstract
             "{nocache}" => "",
             "{\/nocache}" => "",
             "{pagerendertime}" => "",
+            ".tpl" => ".html.twig",
         ];
         foreach ($replacements as $k => $v) {
             $content = preg_replace('/' . $k . '/i', $v, $content);
