@@ -64,7 +64,7 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceModurl($content)
     {
         return preg_replace_callback(
-            "/\{modurl[\s]*([\s\S]*)?\}/i",
+            "/\{modurl[\s]*([^}]*)?\}/i",
             function ($matches) {
                 $params = $this->createParamArray($matches[1]);
                 $mod = $params['modname'];
