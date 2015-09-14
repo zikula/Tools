@@ -41,95 +41,95 @@ class ZikulaConverterTest extends \PHPUnit_Framework_TestCase
     {
         return [
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceBlockPosition
-            ["{blockposition name=left}", "{{ showblockposition('left') }}"],
-            ["{blockposition name='left'}", "{{ showblockposition('left') }}"],
-            ["{blockposition name=\"left\"}", "{{ showblockposition('left') }}"],
-            ["{blockposition name=topnav assign=topnavblock}", "{% set topnavblock = showblockposition('topnav') %}"],
-            ["{blockposition name=topnav assign='topnavblock'}", "{% set topnavblock = showblockposition('topnav') %}"],
-            ["{blockposition name=topnav assign=\"topnavblock\"}", "{% set topnavblock = showblockposition('topnav') %}"],
+            ["123{blockposition name=left}321", "123{{ showblockposition('left') }}321"],
+            ["123{blockposition name='left'}321", "123{{ showblockposition('left') }}321"],
+            ["123{blockposition name=\"left\"}321", "123{{ showblockposition('left') }}321"],
+            ["123{blockposition name=topnav assign=topnavblock}321", "123{% set topnavblock = showblockposition('topnav') %}321"],
+            ["123{blockposition name=topnav assign='topnavblock'}321", "123{% set topnavblock = showblockposition('topnav') %}321"],
+            ["123{blockposition name=topnav assign=\"topnavblock\"}321", "123{% set topnavblock = showblockposition('topnav') %}321"],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceModurl
-            ["{modurl modname='ZikulaSettingsModule' type='admin' func='index'}", "{{ path('zikulasettingsmodule_admin_index') }}"],
+            ["123{modurl modname='ZikulaSettingsModule' type='admin' func='index'}321", "123{{ path('zikulasettingsmodule_admin_index') }}321"],
             [
-                "{modurl modname='ZikulaSettingsModule' type='admin' func='index' foo='bar'}",
-                "{{ path('zikulasettingsmodule_admin_index', {\"foo\":\"bar\"}) }}"
+                "123{modurl modname='ZikulaSettingsModule' type='admin' func='index' foo='bar'}321",
+                "123{{ path('zikulasettingsmodule_admin_index', {\"foo\":\"bar\"}) }}321"
             ],
             [
-                "{modurl modname='ZikulaSettingsModule' type='admin' func='index' foo='bar' boo=far}",
-                "{{ path('zikulasettingsmodule_admin_index', {\"foo\":\"bar\",\"boo\":\"far\"}) }}"
+                "123{modurl modname='ZikulaSettingsModule' type='admin' func='index' foo='bar' boo=far}321",
+                "123{{ path('zikulasettingsmodule_admin_index', {\"foo\":\"bar\",\"boo\":\"far\"}) }}321"
             ],
             [
-                "{modurl modname='ZikulaSettingsModule' type='admin' func='index' foo='bar' boo=\$far}",
-                "{{ path('zikulasettingsmodule_admin_index', {\"foo\":\"bar\",\"boo\":\"far\"}) }}"
+                "123{modurl modname='ZikulaSettingsModule' type='admin' func='index' foo='bar' boo=\$far}321",
+                "123{{ path('zikulasettingsmodule_admin_index', {\"foo\":\"bar\",\"boo\":\"far\"}) }}321"
             ],
             [
-                "{modurl modname='ZikulaSettingsModule' type='admin' func='index' assign='foo'}",
-                "{% set foo = path('zikulasettingsmodule_admin_index') %}"
+                "123{modurl modname='ZikulaSettingsModule' type='admin' func='index' assign='foo'}321",
+                "123{% set foo = path('zikulasettingsmodule_admin_index') %}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceRoute
-            ["{route name='zikulaadminmodule_admin_newcat'}", "{{ path('zikulaadminmodule_admin_newcat') }}"],
-            ["{route name=\"zikulaadminmodule_admin_newcat\"}", "{{ path('zikulaadminmodule_admin_newcat') }}"],
-            ["{route name='zikulaadminmodule_admin_newcat' foo='bar'}", "{{ path('zikulaadminmodule_admin_newcat', {\"foo\":\"bar\"}) }}"],
+            ["123{route name='zikulaadminmodule_admin_newcat'}321", "123{{ path('zikulaadminmodule_admin_newcat') }}321"],
+            ["123{route name=\"zikulaadminmodule_admin_newcat\"}321", "123{{ path('zikulaadminmodule_admin_newcat') }}321"],
+            ["123{route name='zikulaadminmodule_admin_newcat' foo='bar'}321", "123{{ path('zikulaadminmodule_admin_newcat', {\"foo\":\"bar\"}) }}321"],
             [
-                "{route name='zikulaadminmodule_admin_newcat' foo='bar' assign='foo'}",
-                "{% set foo = path('zikulaadminmodule_admin_newcat', {\"foo\":\"bar\"}) %}"
+                "123{route name='zikulaadminmodule_admin_newcat' foo='bar' assign='foo'}321",
+                "123{% set foo = path('zikulaadminmodule_admin_newcat', {\"foo\":\"bar\"}) %}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replacePageaddvar
             [
-                "{pageaddvar name=\"stylesheet\" value=\"\$stylepath/style.css\"}",
-                "{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to @VendorBundleTheme:path/from/Resources #}"
+                "123{pageaddvar name=\"stylesheet\" value=\"\$stylepath/style.css\"}321",
+                "123{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to @VendorBundleTheme:path/from/Resources #}321"
             ],
             [
-                "{pageaddvar name='stylesheet' value=\$stylepath/style.css}",
-                "{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to @VendorBundleTheme:path/from/Resources #}"
+                "123{pageaddvar name='stylesheet' value=\$stylepath/style.css}321",
+                "123{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to @VendorBundleTheme:path/from/Resources #}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceGettext
-            ["{gt text='foo'}", "{{ __('foo') }}"],
+            ["123{gt text='foo'}321", "123{{ __('foo') }}321"],
             [
-                "{gt text='Membership application' assign='templatetitle'}",
-                "{% set templatetitle = __('Membership application') %}"
+                "123{gt text='Membership application' assign='templatetitle'}321",
+                "123{% set templatetitle = __('Membership application') %}321"
             ],
             [
-                "{gt text='Delete: %s' tag1=\$group.name'}",
-                "{{ __f('Delete: %sub%', {\"%sub%\": group.name}) }}"
+                "123{gt text='Delete: %s' tag1=\$group.name'}321",
+                "123{{ __f('Delete: %sub%', {\"%sub%\": group.name}) }}321"
             ],
             [
-                "{gt text='Delete: %s' tag1=\$group.name assign='strDeleteGroup'}",
-                "{% set strDeleteGroup = __f('Delete: %sub%', {\"%sub%\": group.name}) %}"
+                "123{gt text='Delete: %s' tag1=\$group.name assign='strDeleteGroup'}321",
+                "123{% set strDeleteGroup = __f('Delete: %sub%', {\"%sub%\": group.name}) %}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceCheckPermission
             [
-                "{checkpermission component='ZikulaUsersModule::' instance=\"::\" level='ACCESS_MODERATE'}",
-                "{{ hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') }}{# @todo consider `if hasPermission()` #}"
+                "123{checkpermission component='ZikulaUsersModule::' instance=\"::\" level='ACCESS_MODERATE'}321",
+                "123{{ hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') }}{# @todo consider `if hasPermission()` #}321"
             ],
             [
-                "{checkpermission component=ZikulaUsersModule:: instance='::' level=ACCESS_MODERATE}",
-                "{{ hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') }}{# @todo consider `if hasPermission()` #}"
+                "123{checkpermission component=ZikulaUsersModule:: instance='::' level=ACCESS_MODERATE}321",
+                "123{{ hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') }}{# @todo consider `if hasPermission()` #}321"
             ],
             [
-                "{checkpermission component='ZikulaUsersModule::' instance=\"::\" level='ACCESS_MODERATE' assign='foo'}",
-                "{% set foo = hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') %}{# @todo consider `if hasPermission()` #}"
+                "123{checkpermission component='ZikulaUsersModule::' instance=\"::\" level='ACCESS_MODERATE' assign='foo'}321",
+                "123{% set foo = hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') %}{# @todo consider `if hasPermission()` #}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceCheckPermissionBlock
             [
-                "{checkpermissionblock component='ZikulaUsersModule::' instance=\"::\" level='ACCESS_MODERATE'}",
-                "{% if hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') %}"
+                "123{checkpermissionblock component='ZikulaUsersModule::' instance=\"::\" level='ACCESS_MODERATE'}321",
+                "123{% if hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') %}321"
             ],
             [
-                "{checkpermissionblock component=ZikulaUsersModule:: instance='::' level=ACCESS_MODERATE}",
-                "{% if hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') %}"
+                "123{checkpermissionblock component=ZikulaUsersModule:: instance='::' level=ACCESS_MODERATE}321",
+                "123{% if hasPermission('ZikulaUsersModule::', '::', 'ACCESS_MODERATE') %}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceEmptyTest
-            ["if !empty(title)", "if title is not empty"],
+            ["123if !empty(title)321", "123if title is not empty321"],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceAjaxHeader
-            ["{ajaxheader modname='Groups' filename='groups.js' ui=true}", "{# ajaxheader modname='Groups' filename='groups.js' ui=true #}"],
+            ["123{ajaxheader modname='Groups' filename='groups.js' ui=true}321", "123{# ajaxheader modname='Groups' filename='groups.js' ui=true #}321"],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceModvarLookup
             ["modvars.ZikulaGroupsModule.hideclosed", "{{ getModVar('ZikulaGroupsModule', 'hideclosed') }}"],
