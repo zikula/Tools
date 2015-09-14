@@ -220,7 +220,7 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceModvarLookup($content)
     {
         return preg_replace_callback(
-            "/modvars\.([\w]+)\.([\w]+)/", // case sensitive match
+            "/\{\{ modvars\.([\w]+)\.([\w]+) \}\}/", // case sensitive match
             function ($matches) {
                 return "{{ getModVar('$matches[1]', '$matches[2]') }}";
             },

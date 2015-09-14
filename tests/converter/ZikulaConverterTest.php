@@ -132,8 +132,8 @@ class ZikulaConverterTest extends \PHPUnit_Framework_TestCase
             ["123{ajaxheader modname='Groups' filename='groups.js' ui=true}321", "123{# ajaxheader modname='Groups' filename='groups.js' ui=true #}321"],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceModvarLookup
-            ["modvars.ZikulaGroupsModule.hideclosed", "{{ getModVar('ZikulaGroupsModule', 'hideclosed') }}"],
-            ["modvars.ZConfig.sitename", "{{ getModVar('ZConfig', 'sitename') }}"],
+            ["123{{ modvars.ZikulaGroupsModule.hideclosed }}321", "123{{ getModVar('ZikulaGroupsModule', 'hideclosed') }}321"],
+            ["123{{ modvars.ZConfig.sitename }}321", "123{{ getModVar('ZConfig', 'sitename') }}321"],
         ];
     }
 
