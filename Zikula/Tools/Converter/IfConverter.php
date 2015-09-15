@@ -64,7 +64,7 @@ class IfConverter extends ConverterAbstract
 
             // take care of `!foo`
             $match = preg_replace_callback("/(!)([^=\s]+)/i", function ($m) {
-                return "not $m[2]";
+                return (false === strpos($m[2], 'empty')) ? "not $m[2]" : "!$m[2]";
             }, $match);
 
             // take care of bar:foo['hello']
