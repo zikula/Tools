@@ -55,6 +55,7 @@ class ZikulaMiscConverterTest extends \PHPUnit_Framework_TestCase
             ["{/nocache}", ""],
             ["{pagerendertime}", ""],
             ["foo.tpl", "foo.html.twig"],
+            ["foo|safehtml", "foo|safeHtml"],
             ["{adminheader}", "{{ render(controller('ZikulaAdminModule:Admin:adminheader')) }}"],
             ["{adminfooter}", "{{ render(controller('ZikulaAdminModule:Admin:adminfooter')) }}"],
         ];

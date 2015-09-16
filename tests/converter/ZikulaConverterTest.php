@@ -88,6 +88,8 @@ class ZikulaConverterTest extends \PHPUnit_Framework_TestCase
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceGettext
             ["123{gt text='foo'}321", "123{{ __('foo') }}321"],
+            ["{gt text=\"Search\" domain='zikula'}", "{{ __('Search', 'zikula') }}"],
+            ["{gt text=\"Search\" domain='zikula' assign=foo}", "{% set foo = __('Search', 'zikula') %}"],
             [
                 "123{gt text='Membership application' assign='templatetitle'}321",
                 "123{% set templatetitle = __('Membership application') %}321"
@@ -99,6 +101,10 @@ class ZikulaConverterTest extends \PHPUnit_Framework_TestCase
             [
                 "123{gt text='Delete: %s' tag1=\$group.name assign='strDeleteGroup'}321",
                 "123{% set strDeleteGroup = __f('Delete: %sub%', {\"%sub%\": group.name}) %}321"
+            ],
+            [
+                "123{gt text='Delete: %s' domain=\"zikula\" tag1=\$group.name assign='strDeleteGroup'}321",
+                "123{% set strDeleteGroup = __f('Delete: %sub%', {\"%sub%\": group.name}, 'zikula') %}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceCheckPermission
