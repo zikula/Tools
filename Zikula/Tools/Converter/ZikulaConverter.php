@@ -117,35 +117,39 @@ class ZikulaConverter extends ConverterAbstract
     }
 
     /**
+     * replace {gt text='Membership application' assign='templatetitle' domain="zikula"}
+     * replace {gt text='Delete: %s' tag1=$group.name assign='strDeleteGroup'}
      * `assign` is optional parameter
+     * `domain` is optional parameter
      * @param $content
      * @return mixed
      */
     private function replaceGettext($content)
     {
-        // replace {gt text='Membership application' assign='templatetitle'}
-        $newContent[0] = preg_replace_callback(
-            "/\{gt text=['|\"]?([\w\W][^'|\"]+)['|\"]?[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?\}/i",
+        $content = preg_replace_callback(
+            "/\{gt[\s]*([^}]*)?\}/i",
             function ($matches) {
-                $set = (!empty($matches[3])) ? "set $matches[3] = " : '';
-                $delims = $this->delims[(int)!empty($matches[3])];
-                return "$delims[0] {$set}__('$matches[1]') $delims[1]";
+                $params = $this->attributes($matches[1]);
+                $set = !empty($params['assign']) ? "set {$this->variable($params['assign'])} = " : '';
+                $domain = !empty($params['domain']) ? ", '{$this->variable($params['domain'])}'" : '';
+                $delims = $this->delims[(int)!empty($set)];
+                if (!empty($params['tag2'])) {
+                    // @todo design multiple var replace method and accommodate plurals
+                    return $matches[0]; // original text
+                } elseif (!empty($params['tag1'])) {
+                    $func = '__f';
+                    $text = $this->variable(str_replace('%s', '%sub%', $params['text']));
+                    $sub = ", {\"%sub%\": " . $this->variable($params['tag1']) . "}";
+                } else {
+                    $func = '__';
+                    $text = $this->variable($params['text']);
+                    $sub = '';
+                }
+                return "$delims[0] {$set}{$func}('{$text}'{$sub}{$domain}) $delims[1]";
             },
             $content);
 
-        // replace {gt text='Delete: %s' tag1=$group.name assign='strDeleteGroup'}
-        $newContent[1] = preg_replace_callback(
-            "/\{gt text=['|\"]?([\w\W][^'|\"]+)['|\"]?[\s]*tag1=([\S]+)[\s]*(assign=['|\"]?([a-z]+)['|\"]?)?\}/i",
-            function ($matches) {
-                $set = (!empty($matches[4])) ? "set $matches[4] = " : '';
-                $delims = $this->delims[(int)!empty($matches[4])];
-                $matches[1] = str_replace('%s', '%sub%', $matches[1]);
-                $sub = $this->variable($matches[2]);
-                return "$delims[0] {$set}__f('$matches[1]', {\"%sub%\": $sub}) $delims[1]";
-            },
-            $newContent[0]);
-
-        return end($newContent);
+        return $content;
     }
 
     /**
@@ -250,6 +254,7 @@ class ZikulaConverter extends ConverterAbstract
             "{\/nocache}" => "",
             "{pagerendertime}" => "",
             ".tpl" => ".html.twig",
+            "\|safehtml" => "|safeHtml",
             "{adminheader}" => "{{ render(controller('ZikulaAdminModule:Admin:adminheader')) }}",
             "{adminfooter}" => "{{ render(controller('ZikulaAdminModule:Admin:adminfooter')) }}",
         ];
