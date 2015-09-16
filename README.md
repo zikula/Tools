@@ -1,10 +1,18 @@
+[![Build Status](https://travis-ci.org/zikula/Tools.svg)](https://travis-ci.org/zikula/Tools)
+
 Zikula Tools
 ============
 
 Migration tools for Zikula
 
 Usage:
-    zikula-tool
+```Shell
+    zikula-tool module:controller_actions --dir=./Controller --force
+    zikula-tool module:ns --dir=. --vendor=Acme --module-name=WidgetModule
+    zikula-tool module:restructure --vendor=Acme --dir=. --module-name=WidgetModule --force
+    zikula-tool theme:restructure --dir=theme/MyTheme --theme=MyTheme
+    zikula-tool toTwig:convert path/to/smarty/templates
+```
 
 Warning
 -------
