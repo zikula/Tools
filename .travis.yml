@@ -7,6 +7,8 @@ php:
   - hhvm
   - nightly
 
-composer install
+install:
+  - composer install
 
-phpunit
+script:
+  - phpunit
