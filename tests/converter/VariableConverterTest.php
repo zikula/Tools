@@ -56,7 +56,10 @@ class VariableConverterTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 '{$person->name}', '{{ person.name }}'
-            )
+            ),
+            array(
+                '{$foo|filter}', '{{ foo|filter }}'
+            ),
         );
     }
 
