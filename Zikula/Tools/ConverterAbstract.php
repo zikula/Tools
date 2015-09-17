@@ -70,10 +70,11 @@ abstract class ConverterAbstract
     /**
      * Method to extract key/value pairs out of a string with xml style attributes
      *
-     * @param   string $string String containing xml style attributes
-     * @return  array   Key/Value pairs for the attributes
+     * @param string $string String containing xml style attributes
+     * @param bool $convertVariables strip values of $, ' and "
+     * @return array Key/Value pairs for the attributes
      */
-    protected function attributes($string)
+    protected function attributes($string, $convertVariables = false)
     {
         //Initialize variables
         $attr = array();
@@ -88,7 +89,7 @@ abstract class ConverterAbstract
                 $value = trim($attr[2][$i]);
                 $key = ($attr[1][$i]) ? trim($attr[1][$i]) : trim(trim($value, '"'), "'");
 
-                $retarray[$key] = $value;
+                $retarray[$key] = $convertVariables ? $this->variable($value) : $value;
             }
         }
         return $retarray;

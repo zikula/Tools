@@ -66,7 +66,7 @@ class ZikulaConverter extends ConverterAbstract
         return preg_replace_callback(
             "/\{modurl[\s]*([^}]*)?\}/i",
             function ($matches) {
-                $params = $this->createParamArray($matches[1]);
+                $params = $this->attributes($matches[1], true);
                 $mod = $params['modname'];
                 $type = $params['type'];
                 $func = $params['func'];
@@ -89,14 +89,15 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceRoute($content)
     {
         return preg_replace_callback(
-            "/\{route name=['|\"]?([\w]+)['|\"]?[\s]*([\s\S]*)?\}/i",
+            "/\{route[\s]*([^}]*)?\}/i",
             function ($matches) {
-                $params = !empty($matches[2]) ? $this->createParamArray($matches[2]) : null;
+                $params = $this->attributes($matches[1], true);
+                $routeId = $params['name'];
                 $set = !empty($params['assign']) ? "set $params[assign] = " : '';
                 $delims = $this->delims[(int)!empty($set)];
-                unset($params['assign']);
+                unset($params['name'], $params['assign']);
                 $paramString = !empty($params) ? ', ' . json_encode($params) : '';
-                return "$delims[0] {$set}path('$matches[1]'{$paramString}) $delims[1]";
+                return "$delims[0] {$set}path('$routeId'{$paramString}) $delims[1]";
             },
             $content);
     }
@@ -129,20 +130,20 @@ class ZikulaConverter extends ConverterAbstract
         $content = preg_replace_callback(
             "/\{gt[\s]*([^}]*)?\}/i",
             function ($matches) {
-                $params = $this->attributes($matches[1]);
-                $set = !empty($params['assign']) ? "set {$this->variable($params['assign'])} = " : '';
-                $domain = !empty($params['domain']) ? ", '{$this->variable($params['domain'])}'" : '';
+                $params = $this->attributes($matches[1], true);
+                $set = !empty($params['assign']) ? "set $params[assign] = " : '';
+                $domain = !empty($params['domain']) ? ", '$params[domain]'" : '';
                 $delims = $this->delims[(int)!empty($set)];
                 if (!empty($params['tag2'])) {
                     // @todo design multiple var replace method and accommodate plurals
                     return $matches[0]; // original text
                 } elseif (!empty($params['tag1'])) {
                     $func = '__f';
-                    $text = $this->variable(str_replace('%s', '%sub%', $params['text']));
-                    $sub = ", {\"%sub%\": " . $this->variable($params['tag1']) . "}";
+                    $text = str_replace('%s', '%sub%', $params['text']);
+                    $sub = ", {\"%sub%\": $params[tag1]}";
                 } else {
                     $func = '__';
-                    $text = $this->variable($params['text']);
+                    $text = $params['text'];
                     $sub = '';
                 }
                 return "$delims[0] {$set}{$func}('{$text}'{$sub}{$domain}) $delims[1]";
@@ -193,7 +194,7 @@ class ZikulaConverter extends ConverterAbstract
     private function replaceEmptyTest($content)
     {
         return preg_replace_callback(
-            "/(!)?empty\(([\w_$-]+)\)/i",
+            "/(!)?empty\(([\w_$\[\]-]+)\)/i",
             function ($matches) {
                 $not = !empty($matches[1]) ? 'not ' : '';
                 return "$matches[2] is {$not}empty";
@@ -278,23 +279,5 @@ class ZikulaConverter extends ConverterAbstract
     public function getDescription()
     {
         return 'Convert zikula-specific smarty tags to compatible twig tags.';
-    }
-
-    /**
-     * Create array of parameters from string provided by Smarty template function
-     * @param $string
-     * @return array
-     */
-    private function createParamArray($string)
-    {
-        $rawParams = explode(' ', $string);
-        $params = [];
-        foreach($rawParams as $param) {
-            list($k, $v) = explode('=', $param);
-//            $params[trim($k)] = trim(str_replace(['\'','"'], '', $v));
-            $params[trim($k)] = $this->variable($v);
-        }
-
-        return $params;
     }
 }
