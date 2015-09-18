@@ -58,6 +58,7 @@ class ZikulaMiscConverterTest extends \PHPUnit_Framework_TestCase
             ["foo|safehtml", "foo|safeHtml"],
             ["{adminheader}", "{{ render(controller('ZikulaAdminModule:Admin:adminheader')) }}"],
             ["{adminfooter}", "{{ render(controller('ZikulaAdminModule:Admin:adminfooter')) }}"],
+            ["{insert name='getstatusmsg'}", "{{ showflashes() }}"],
         ];
     }
 

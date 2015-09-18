@@ -86,6 +86,11 @@ class ZikulaConverterTest extends \PHPUnit_Framework_TestCase
                 "123{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to zasset('@VendorBundleTheme:path/from/Resources') #}321"
             ],
 
+            // test \Zikula\Tools\Converter\ZikulaConverter::replacePagesetvar
+            [
+                "{pagesetvar name='title' value=\$templatetitle}", "{{ pageSetVar('title', templatetitle) }}",
+            ],
+
             // test \Zikula\Tools\Converter\ZikulaConverter::replaceGettext
             ["123{gt text='foo'}321", "123{{ __('foo') }}321"],
             ["{gt text=\"Search\" domain='zikula'}", "{{ __('Search', 'zikula') }}"],

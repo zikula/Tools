@@ -27,6 +27,7 @@ class ZikulaConverter extends ConverterAbstract
         $content = $this->replaceModurl($content);
         $content = $this->replaceRoute($content);
         $content = $this->replacePageaddvar($content);
+        $content = $this->replacePagesetvar($content);
         $content = $this->replaceGettext($content);
         $content = $this->replaceCheckPermission($content);
         $content = $this->replaceCheckPermissionBlock($content);
@@ -98,6 +99,23 @@ class ZikulaConverter extends ConverterAbstract
                 unset($params['name'], $params['assign']);
                 $paramString = !empty($params) ? ', ' . json_encode($params) : '';
                 return "$delims[0] {$set}path('$routeId'{$paramString}) $delims[1]";
+            },
+            $content);
+    }
+
+    /**
+     * replace {pagesetvar name='title' value=$templatetitle}
+     * WARNING! value set as variable, not string.
+     * @param $content
+     * @return mixed
+     */
+    private function replacePagesetvar($content)
+    {
+        return preg_replace_callback(
+            "/\{pagesetvar[\s]*([^}]*)?\}/i",
+            function ($matches) {
+                $params = $this->attributes($matches[1], true);
+                return "{{ pageSetVar('$params[name]', $params[value]) }}";
             },
             $content);
     }
@@ -258,6 +276,7 @@ class ZikulaConverter extends ConverterAbstract
             "\|safehtml" => "|safeHtml",
             "{adminheader}" => "{{ render(controller('ZikulaAdminModule:Admin:adminheader')) }}",
             "{adminfooter}" => "{{ render(controller('ZikulaAdminModule:Admin:adminfooter')) }}",
+            "{insert name='getstatusmsg'}" => "{{ showflashes() }}",
         ];
         foreach ($replacements as $k => $v) {
             $content = preg_replace('/' . $k . '/i', $v, $content);
