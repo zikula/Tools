@@ -79,11 +79,15 @@ class ZikulaConverterTest extends \PHPUnit_Framework_TestCase
             // test \Zikula\Tools\Converter\ZikulaConverter::replacePageaddvar
             [
                 "123{pageaddvar name=\"stylesheet\" value=\"\$stylepath/style.css\"}321",
-                "123{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to zasset('@VendorBundleTheme:path/from/Resources') #}321"
+                "123{{ pageAddAsset('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to zasset('@VendorBundleTheme:path/from/Resources') #}321"
             ],
             [
                 "123{pageaddvar name='stylesheet' value=\$stylepath/style.css}321",
-                "123{{ pageAddVar('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to zasset('@VendorBundleTheme:path/from/Resources') #}321"
+                "123{{ pageAddAsset('stylesheet', '') }}{# @todo oldpath= \$stylepath/style.css to zasset('@VendorBundleTheme:path/from/Resources') #}321"
+            ],
+            [
+                "123{pageaddvar name='foo' value='bar'}321",
+                "123{{ pageSetVar('foo', 'bar') }}321"
             ],
 
             // test \Zikula\Tools\Converter\ZikulaConverter::replacePagesetvar

@@ -130,7 +130,11 @@ class ZikulaConverter extends ConverterAbstract
         return preg_replace_callback(
             "/\{pageaddvar name=['|\"]?([\w]+)['|\"]?\svalue=['|\"]?([a-z0-9$:_][^'|\"]+)['|\"]?\}/i",
             function ($matches) {
-                return "{{ pageAddVar('$matches[1]', '') }}{# @todo oldpath= $matches[2] to zasset('@VendorBundleTheme:path/from/Resources') #}";
+                if (in_array($matches[1], ['stylesheet', 'javascript', 'header', 'footer'])) {
+                    return "{{ pageAddAsset('$matches[1]', '') }}{# @todo oldpath= $matches[2] to zasset('@VendorBundleTheme:path/from/Resources') #}";
+                } else {
+                    return "{{ pageSetVar('$matches[1]', '$matches[2]') }}";
+                }
             },
             $content);
     }
