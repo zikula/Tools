@@ -46,7 +46,7 @@ class ZikulaMiscConverterTest extends \PHPUnit_Framework_TestCase
             ["{lang}", "{{ pagevars.lang }}"],
             ["{langdirection}", "{{ pagevars.langdirection }}"],
             ["{charset}", "{{ pagevars.meta.charset }}"],
-            ["{homepage}", "{{ app.request.baseUrl }}"],
+            ["{homepage}", "{{ pagevars.homepath }}"],
             ["{adminpanelmenu}", "{# adminpanelmenu #}"],
             ["{{ content }}", "{{ content|raw }}"],
             ["{{ maincontent }}", "{{ maincontent|raw }}"],
